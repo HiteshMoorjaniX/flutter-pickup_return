@@ -1,0 +1,3 @@
+
+var authToken = '';
+var clientId;
