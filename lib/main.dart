@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:toast/toast.dart';
+import 'ClientWidgets/PendingPickupItems.dart';
 import 'DeliveryMenWidgets/ClientList.dart';
 import 'login.dart';
 import 'globals.dart' as globals;
@@ -244,11 +245,14 @@ class _MyAppState extends State<MyApp> {
                                     password: passwordText.text);
 
                                 print("Helloo");
-                                bool status = await fetchLogin(body: lg.toMap());
-                                if(status == true){
+                                var status = await fetchLogin(body: lg.toMap());
+                                if(status == 'deliveryboy'){
                                   //Navigator.push(context, MaterialPageRoute(builder: (context) => PickupItem()),);
                                   //Navigator.push(context, MaterialPageRoute(builder: (context) => ClientList(), settings: RouteSettings(arguments: token)),);
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => ClientList()),);
+                                }
+                                else if(status == 'client'){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PendingPickupItems()),);
                                 }
                                 else{
                                   Toast.show("Invalid Username/Password",
@@ -356,7 +360,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-  Future<bool> fetchLogin({Map body}) async {
+  Future<String> fetchLogin({Map body}) async {
 
   /*  var map = new Map<String, dynamic>();
     map["un"] = un;
@@ -381,11 +385,14 @@ class _MyAppState extends State<MyApp> {
           token = user['access_token'];
           globals.authToken = token;
           print(user['user']['id']);
+          print('User type : ');
+          print(user['user']['user_type']);
+
           if(statusCode == 200){
-            return true;
+            return user['user']['user_type'];
           }
           else{
-            return false;
+            return 'error';
           }
 
           /*Map<String, dynamic> user = json.decode(response.body);
