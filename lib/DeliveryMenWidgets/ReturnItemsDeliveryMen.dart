@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:pickup_return/api_config.dart' as Api_Config;
+import 'package:pickup_return/DeliveryMenWidgets/ReturnItemsChallan.dart' as challan;
+import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 
 class ReturnItems extends StatefulWidget {
   @override
@@ -162,6 +164,9 @@ class _ReturnItemsState extends State<ReturnItems> {
   }
 
   Future<String> returnSelectedItems() async {
+
+    var listForChallan = [];
+
     print(_quantityController.length);
 
     var jsonArr = [];
@@ -174,6 +179,7 @@ class _ReturnItemsState extends State<ReturnItems> {
         print(_quantityController[i].text);
         var item_id = data[i]['items_id'];
         var pickup_id = data[i]['pickup_id'];
+        listForChallan.add({'item_id': item_id, 'item_name' : data[i]['item_name'] ,'item_qua': q});
         jsonArr.add({'item_id': item_id, 'pickup_id': pickup_id, 'qty': q});
       }
     }
@@ -195,13 +201,28 @@ class _ReturnItemsState extends State<ReturnItems> {
       print("status code :   $statusCode ");
       print(response.body);
     });
+
+
+   print('list is :');
+    print(listForChallan);
+    String path =await challan.generatePdf(listForChallan);
+
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PDFScreen(path: path)),
+    );
+
+
+
   }
 
   Future<String> showPickedItemsList() async {
     var body = {
       "client_id": '${globals.clientId}',
     };
-
+    print('Body :');
+    print(body);
     http
         .post(Api_Config.showPickedItems, headers: headerParams, body: body)
         .then((http.Response response) {

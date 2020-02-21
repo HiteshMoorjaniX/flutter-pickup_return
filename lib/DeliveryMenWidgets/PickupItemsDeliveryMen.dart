@@ -1,12 +1,16 @@
 import 'dart:collection';
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pdfLib;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:pickup_return/DeliveryMenWidgets/PickupItemsChallan.dart' as challan;
 
 class PickupItems extends StatefulWidget {
   @override
@@ -19,8 +23,7 @@ class _PickupItemsState extends State<PickupItems> {
   var quantity = 0;
   List<TextEditingController> _quantityController = new List();
   Map<dynamic, dynamic> list = new Map<dynamic, dynamic>();
-  final String pickedItemsStoreUrl =
-      Api_Config.pickedItemsAddApi;
+  final String pickedItemsStoreUrl = Api_Config.pickedItemsAddApi;
 
   //LinkedHashMap<String,int> pickupMap = new LinkedHashMap<String,int>();
 
@@ -195,7 +198,7 @@ class _PickupItemsState extends State<PickupItems> {
                 shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
                 color: Colors.blue,
-                onPressed: () => pickSelectedItems(),
+                onPressed: () => pickSelectedItems(context),
                 //onPressed: this.pickSelectedItems(),
                 child: new Text("Pickup"),
               ),
@@ -241,14 +244,15 @@ class _PickupItemsState extends State<PickupItems> {
 
     var response = await http.post(pickedItemsStoreUrl,headers: {"Authorization": "Bearer " "$authToken"},body: bodyData);
     print(response.body);
-    *//*var response = await http.get(pickupItemsUrl, headers: {"Authorization": "Bearer " "$authToken"});
-    print(response.body);*//*
+    */ /*var response = await http.get(pickupItemsUrl, headers: {"Authorization": "Bearer " "$authToken"});
+    print(response.body);*/ /*
    // body: {"client_id" : 1});
   }*/
 
+  Future<String> pickSelectedItems(context) async {
 
+    var listForChallan = [];
 
-  Future<String> pickSelectedItems() async {
     Map<String, String> headerParams = {
       "Accept": 'application/json',
       "Authorization": "Bearer ${globals.authToken}",
@@ -259,6 +263,11 @@ class _PickupItemsState extends State<PickupItems> {
       int q = int.parse(_quantityController[i].text);
       if (q > 0) {
         print(data[i]['item_name']);
+        listForChallan.add({
+          'item_name' : data[i]['item_name'],
+          'item_id' : data[i]['id'],
+          'item_qua' : q
+        });
         print(_quantityController[i].text);
         var item_id = data[i]['id'];
 
@@ -266,7 +275,7 @@ class _PickupItemsState extends State<PickupItems> {
       }
     }
 
-    Map<dynamic,dynamic> abc = new Map<dynamic,dynamic>();
+    Map<dynamic, dynamic> abc = new Map<dynamic, dynamic>();
     abc[1] = '3';
     abc[2] = '10';
 
@@ -277,8 +286,6 @@ class _PickupItemsState extends State<PickupItems> {
       "list": ls,
     };
 
-
-
     print('list : $ls');
 
     var ClientId = globals.clientId;
@@ -287,20 +294,18 @@ class _PickupItemsState extends State<PickupItems> {
     var map = new Map<String, String>();
     map['1'] = '3';
 
-
     // var response = await http.get(url, headers: {"Authorization" : "Bearer " "$authToken"});
-   await http
-        .post(pickedItemsStoreUrl,headers: headerParams, body: body
+    await http
+        .post(pickedItemsStoreUrl, headers: headerParams, body: body
 
-       /*{
+            /*{
               "client_id": 1,
               "list": map,
             }*/
 
-   //         headers: headerParams
-   )
+            //         headers: headerParams
+            )
         .then((http.Response response) {
-
       final int statusCode = response.statusCode;
 
       print("status code :   $statusCode ");
@@ -309,6 +314,34 @@ class _PickupItemsState extends State<PickupItems> {
       Map<String, dynamic> user = json.decode(response.body);
       print(user);
     });
+
+    // final pdfLib.Document pdf = pdfLib.Document(deflate: zlib.encode);
+
+    // pdf.addPage(
+    //   pdfLib.MultiPage(
+    //       build: (context) => [
+    //             pdfLib.Text('Hello Wrold'),
+    //           ]),
+    // );
+
+
+    // final String dir = (await getApplicationDocumentsDirectory()).path;
+
+    // final String path = '$dir/challand.pdf';
+    // print('path ::');
+    // print(path);
+    // final File file = File(path);
+
+    // file.writeAsBytesSync(pdf.save());
+    print('list is :');
+    print(listForChallan);
+    String path =await challan.generatePdf(listForChallan);
+
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PDFScreen(path: path)),
+    );
   }
 
   void _addQuantity(int index) {
