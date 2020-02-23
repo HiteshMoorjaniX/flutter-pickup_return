@@ -44,7 +44,7 @@ generatePdf(listForChallan,grand_total) async {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('Pickup Item Challan', textScaleFactor: 2),
+                      Text('Return Item Challan', textScaleFactor: 2),
                       PdfLogo()
                     ])),
             
@@ -68,7 +68,7 @@ generatePdf(listForChallan,grand_total) async {
 
   final String dir = (await getApplicationDocumentsDirectory()).path;
 
-  final String path = '$dir/challanp.pdf';
+  final String path = '$dir/challanr.pdf';
   print('path ::');
   print(path);
   final File file = File(path);

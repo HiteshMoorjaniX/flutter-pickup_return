@@ -5,46 +5,48 @@ import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
-import 'package:pickup_return/ClientWidgets/PendingPickupItemsChallan.dart' as challan;
+import 'package:pickup_return/ClientWidgets/PendingReturnItemsChallan.dart' as challan;
 
-class PendingPickupItemsList extends StatefulWidget {
-  final int pickup_id;
+class PendingReturnItemsList extends StatefulWidget {
+  final int return_id;
 
-  const PendingPickupItemsList({Key key, this.pickup_id}) : super(key: key);
+  const PendingReturnItemsList({Key key, this.return_id}) : super(key: key);
 
   @override
-  _PendingPickupItemsListState createState() =>
-      _PendingPickupItemsListState(pickup_id);
+  _PendingReturnItemsListState createState() =>
+      _PendingReturnItemsListState(return_id);
 }
 
-class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
+class _PendingReturnItemsListState extends State<PendingReturnItemsList> {
   String path;
+
   var grand_total = 0;
+
   Map<String, String> headerParams = {
     "Accept": 'application/json',
     "Authorization": "Bearer ${globals.authToken}",
   };
   List data;
-  int pickup_id;
+  int return_id;
 
-  _PendingPickupItemsListState(this.pickup_id);
+  _PendingReturnItemsListState(this.return_id);
 
   @override
   void initState() {
-    this.showPendingItems(pickup_id);
+    showPendingItems(return_id);
     super.initState();
   }
 
-  Future<void> showPendingItems(pickup_id) async {
-    print('Pickup id : ');
-    print(pickup_id);
+  Future<void> showPendingItems(return_id) async {
+    print('Return id : ');
+    print(return_id);
 
-    var body = {"pickup_id": '$pickup_id'};
-
-    // var body = {"pickup_id": '11'};
+    var body = {
+      "return_id": '$return_id',
+    };
 
     await http
-        .post(Api_Config.showPendingPickupItemsThroughPickupId,
+        .post(Api_Config.showPendingReturnItemsThroughReturnId,
             body: body, headers: headerParams)
         .then((http.Response response) {
       final int statusCode = response.statusCode;
@@ -58,23 +60,22 @@ class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
       setState(() {});
     });
 
-      print('data is : ');
-      print(data);
-      
-      print(data.length);
-      for(var i=0;i<data.length;i++){
-        grand_total = grand_total + data[i]['price'];
-      }
-      print('Total is : ');
-      print(grand_total);
-      path = await challan.generatePdf(data,grand_total);
+    print('data is : ');
+    print(data);
 
+    print(data.length);
+    for (var i = 0; i < data.length; i++) {
+      grand_total = grand_total + data[i]['price'];
+    }
+    print('Total is : ');
+    print(grand_total);
+    path = await challan.generatePdf(data, grand_total);
   }
 
   viewChallan() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PDFScreen(path: path,status : 'pickup',id: '$pickup_id',)),
+      MaterialPageRoute(builder: (context) => PDFScreen(path: path,status: 'return',id: '$return_id',)),
     );
   }
 
@@ -82,7 +83,7 @@ class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text("Pending Pickup Items"),
+          title: new Text("Pending Return Items"),
         ),
         body: Column(
           children: <Widget>[
@@ -90,7 +91,7 @@ class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
               child: new ListView.builder(
                 itemCount: data == null ? 0 : data.length,
                 itemBuilder: (BuildContext context, int index) {
-                  var pickup_id = data[index]['pickup_id'];
+                  var return_id = data[index]['return_id'];
                   return new Container(
                     child: new Center(
                       child: new Column(
@@ -139,11 +140,13 @@ class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
                     borderRadius: new BorderRadius.circular(30.0)),
                 color: Colors.blue,
                 onPressed: () => viewChallan(),
-                //onPressed: this.pickSelectedItems(),
+
                 child: new Text("View Challan"),
               ),
             ),
-            SizedBox(height: 20.0,),
+            SizedBox(
+              height: 20.0,
+            ),
           ],
         ));
   }

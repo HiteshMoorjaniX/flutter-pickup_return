@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:pickup_return/api_config.dart' as Api_Config;
-import 'package:pickup_return/DeliveryMenWidgets/ReturnItemsChallan.dart' as challan;
+import 'package:pickup_return/DeliveryMenWidgets/ReturnItemsChallan.dart'
+    as challan;
 import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 
 class ReturnItems extends StatefulWidget {
@@ -164,7 +165,6 @@ class _ReturnItemsState extends State<ReturnItems> {
   }
 
   Future<String> returnSelectedItems() async {
-
     var listForChallan = [];
 
     print(_quantityController.length);
@@ -179,7 +179,11 @@ class _ReturnItemsState extends State<ReturnItems> {
         print(_quantityController[i].text);
         var item_id = data[i]['items_id'];
         var pickup_id = data[i]['pickup_id'];
-        listForChallan.add({'item_id': item_id, 'item_name' : data[i]['item_name'] ,'item_qua': q});
+        listForChallan.add({
+          'item_id': item_id,
+          'item_name': data[i]['item_name'],
+          'item_qua': q
+        });
         jsonArr.add({'item_id': item_id, 'pickup_id': pickup_id, 'qty': q});
       }
     }
@@ -193,28 +197,38 @@ class _ReturnItemsState extends State<ReturnItems> {
       "client_id": '${globals.clientId}',
       "list": ls,
     };
-    await http
-        .post(Api_Config.addReturnItems, body: body, headers: headerParams)
-        .then((http.Response response) {
-      final int statusCode = response.statusCode;
 
-      print("status code :   $statusCode ");
-      print(response.body);
-    });
+    // await http
+    //     .post(Api_Config.addReturnItems, body: body, headers: headerParams)
+    //     .then((http.Response response) {
+    //   final int statusCode = response.statusCode;
 
+    //   print("status code :   $statusCode ");
+    //   print(response.body);
+    // });
 
-   print('list is :');
+    print('list is :');
     print(listForChallan);
-    String path =await challan.generatePdf(listForChallan);
+    String path = await challan.generatePdf(listForChallan);
 
-
-    Navigator.push(
+    String received = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PDFScreen(path: path)),
+      MaterialPageRoute(
+          builder: (context) => PDFScreen(
+                path: path,
+                status: 'returndeliverymen',
+                data: body,
+              )),
     );
 
+    if (received == 'return') {
+      Navigator.pop(context);
 
-
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ReturnItems()),
+      );
+    }
   }
 
   Future<String> showPickedItemsList() async {
@@ -223,7 +237,7 @@ class _ReturnItemsState extends State<ReturnItems> {
     };
     print('f');
     print(body);
-    http
+    await http
         .post(Api_Config.showPickedItems, headers: headerParams, body: body)
         .then((http.Response response) {
       final int statusCode = response.statusCode;
@@ -236,6 +250,9 @@ class _ReturnItemsState extends State<ReturnItems> {
       var convertDataToJson = json.decode(response.body);
       data = convertDataToJson['data'];
       print(data.length);
+      if(data.length == 0){
+        // Need to add code for empty list
+      }
       print(data[0]['item_name']);
       // print(_quantityController.length);
 

@@ -47,24 +47,32 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
               ),
             ),
             new ListTile(
-              title: new Text('Pending Pickup Items'),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new PendingPickupItems())),
-            ),
+                title: new Text('Pending Pickup Items'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new PendingPickupItems()));
+                }),
             new ListTile(
-              title: new Text('Pending Return Items'),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) => new PendingReturnItems())),
-            ),
+                title: new Text('Pending Return Items'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new PendingReturnItems()));
+                }),
             new ListTile(
               title: new Text('Request for new Items'),
             ),
             new ListTile(
-              title: new Text('Order History'),
-              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      new ClientOrdersHistory())),
-            ),
+                title: new Text('Order History'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new ClientOrdersHistory()));
+                }),
             new Divider(),
             new ListTile(
               title: new Text('Close'),

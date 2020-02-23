@@ -10,7 +10,8 @@ import 'package:pickup_return/globals.dart' as globals;
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
-import 'package:pickup_return/DeliveryMenWidgets/PickupItemsChallan.dart' as challan;
+import 'package:pickup_return/DeliveryMenWidgets/PickupItemsChallan.dart'
+    as challan;
 
 class PickupItems extends StatefulWidget {
   @override
@@ -250,7 +251,6 @@ class _PickupItemsState extends State<PickupItems> {
   }*/
 
   Future<String> pickSelectedItems(context) async {
-
     var listForChallan = [];
 
     Map<String, String> headerParams = {
@@ -264,9 +264,9 @@ class _PickupItemsState extends State<PickupItems> {
       if (q > 0) {
         print(data[i]['item_name']);
         listForChallan.add({
-          'item_name' : data[i]['item_name'],
-          'item_id' : data[i]['id'],
-          'item_qua' : q
+          'item_name': data[i]['item_name'],
+          'item_id': data[i]['id'],
+          'item_qua': q
         });
         print(_quantityController[i].text);
         var item_id = data[i]['id'];
@@ -275,9 +275,9 @@ class _PickupItemsState extends State<PickupItems> {
       }
     }
 
-    Map<dynamic, dynamic> abc = new Map<dynamic, dynamic>();
-    abc[1] = '3';
-    abc[2] = '10';
+    // Map<dynamic, dynamic> abc = new Map<dynamic, dynamic>();
+    // abc[1] = '3';
+    // abc[2] = '10';
 
     var ls = json.encode(list);
 
@@ -291,29 +291,29 @@ class _PickupItemsState extends State<PickupItems> {
     var ClientId = globals.clientId;
     print('Client id is : $ClientId');
 
-    var map = new Map<String, String>();
-    map['1'] = '3';
+    // var map = new Map<String, String>();
+    // map['1'] = '3';
 
     // var response = await http.get(url, headers: {"Authorization" : "Bearer " "$authToken"});
-    await http
-        .post(pickedItemsStoreUrl, headers: headerParams, body: body
+    // await http
+    //     .post(pickedItemsStoreUrl, headers: headerParams, body: body
 
-            /*{
-              "client_id": 1,
-              "list": map,
-            }*/
+    //         /*{
+    //           "client_id": 1,
+    //           "list": map,
+    //         }*/
 
-            //         headers: headerParams
-            )
-        .then((http.Response response) {
-      final int statusCode = response.statusCode;
+    //         //         headers: headerParams
+    //         )
+    //     .then((http.Response response) {
+    //   final int statusCode = response.statusCode;
 
-      print("status code :   $statusCode ");
-      print('Response is : $response');
-      print(response.body);
-      Map<String, dynamic> user = json.decode(response.body);
-      print(user);
-    });
+    //   print("status code :   $statusCode ");
+    //   print('Response is : $response');
+    //   print(response.body);
+    //   Map<String, dynamic> user = json.decode(response.body);
+    //   print(user);
+    // });
 
     // final pdfLib.Document pdf = pdfLib.Document(deflate: zlib.encode);
 
@@ -323,7 +323,6 @@ class _PickupItemsState extends State<PickupItems> {
     //             pdfLib.Text('Hello Wrold'),
     //           ]),
     // );
-
 
     // final String dir = (await getApplicationDocumentsDirectory()).path;
 
@@ -335,13 +334,26 @@ class _PickupItemsState extends State<PickupItems> {
     // file.writeAsBytesSync(pdf.save());
     print('list is :');
     print(listForChallan);
-    String path =await challan.generatePdf(listForChallan);
+    String path = await challan.generatePdf(listForChallan);
 
-
-    Navigator.push(
+    String received = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PDFScreen(path: path)),
+      MaterialPageRoute(
+          builder: (context) => PDFScreen(
+                path: path,
+                status: 'pickupdeliverymen',
+                data: body,
+              )),
     );
+
+    if (received == 'pickup') {
+      Navigator.pop(context);
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PickupItems()),
+      );
+    }
   }
 
   void _addQuantity(int index) {

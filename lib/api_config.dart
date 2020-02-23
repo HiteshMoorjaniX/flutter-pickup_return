@@ -13,3 +13,6 @@ var showPendingReturnItems = 'https://prm.gatetouch.com/api/get-return-pending';
 
 var showPendingPickupItemsThroughPickupId = 'https://prm.gatetouch.com/api/get-pickup-item';
 var showPendingReturnItemsThroughReturnId = 'https://prm.gatetouch.com/api/get-return-item';
+
+var confirmPendingPickupItems = 'https://prm.gatetouch.com/api/confom-pikup-status';
+var confirmPendingReturnItems = 'https://prm.gatetouch.com/api/confom-return-status';
