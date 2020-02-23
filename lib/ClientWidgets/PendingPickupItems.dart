@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pickup_return/ClientWidgets/ClientOrdersHistory.dart';
 import 'package:pickup_return/ClientWidgets/PendingPickupItemsList.dart';
+import 'package:pickup_return/ClientWidgets/PendingReturnItems.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
@@ -30,7 +32,47 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Client List"),
+        title: new Text("Pending Pickup Items"),
+      ),
+      drawer: new Drawer(
+        child: new ListView(
+          children: <Widget>[
+            new UserAccountsDrawerHeader(
+              accountName: new Text('Hitesh Moorjani'),
+              accountEmail: null,
+              currentAccountPicture: new GestureDetector(
+                child: new CircleAvatar(
+                  backgroundImage: new AssetImage('assets/as.png'),
+                ),
+              ),
+            ),
+            new ListTile(
+              title: new Text('Pending Pickup Items'),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new PendingPickupItems())),
+            ),
+            new ListTile(
+              title: new Text('Pending Return Items'),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) => new PendingReturnItems())),
+            ),
+            new ListTile(
+              title: new Text('Request for new Items'),
+            ),
+            new ListTile(
+              title: new Text('Order History'),
+              onTap: () => Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new ClientOrdersHistory())),
+            ),
+            new Divider(),
+            new ListTile(
+              title: new Text('Close'),
+              trailing: new Icon(Icons.cancel),
+              onTap: () => Navigator.of(context).pop(),
+            )
+          ],
+        ),
       ),
       body: new ListView.builder(
         itemCount: data == null ? 0 : data.length,
@@ -76,12 +118,11 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
   }
 
   showPendingPickupItemsForPickupId(pickup_id) {
-    
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PendingPickupItemsList(pickup_id: pickup_id)),
+      MaterialPageRoute(
+          builder: (context) => PendingPickupItemsList(pickup_id: pickup_id)),
     );
-
   }
 
   Future<String> fetchPendingPickupItems() async {
