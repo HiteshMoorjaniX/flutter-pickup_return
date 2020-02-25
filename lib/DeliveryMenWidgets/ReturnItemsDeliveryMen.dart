@@ -182,7 +182,7 @@ class _ReturnItemsState extends State<ReturnItems> {
         listForChallan.add({
           'item_id': item_id,
           'item_name': data[i]['item_name'],
-          'item_qua': q
+          'item_qua': q,
         });
         jsonArr.add({'item_id': item_id, 'pickup_id': pickup_id, 'qty': q});
       }

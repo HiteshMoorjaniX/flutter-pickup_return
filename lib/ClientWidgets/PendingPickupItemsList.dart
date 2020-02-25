@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pickup_return/ClientWidgets/PendingPickupItems.dart';
 import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
-import 'package:pickup_return/ClientWidgets/PendingPickupItemsChallan.dart' as challan;
+import 'package:pickup_return/ClientWidgets/PendingPickupItemsChallan.dart'
+    as challan;
 
 class PendingPickupItemsList extends StatefulWidget {
   final int pickup_id;
@@ -58,24 +60,36 @@ class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
       setState(() {});
     });
 
-      print('data is : ');
-      print(data);
-      
-      print(data.length);
-      for(var i=0;i<data.length;i++){
-        grand_total = grand_total + data[i]['price'];
-      }
-      print('Total is : ');
-      print(grand_total);
-      path = await challan.generatePdf(data,grand_total);
+    print('data is : ');
+    print(data);
 
+    print(data.length);
+    for (var i = 0; i < data.length; i++) {
+      grand_total = grand_total + data[i]['price'];
+    }
+    print('Total is : ');
+    print(grand_total);
+    path = await challan.generatePdf(data, grand_total);
   }
 
-  viewChallan() {
-    Navigator.push(
+  viewChallan() async {
+    String received = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PDFScreen(path: path,status : 'pickup',id: '$pickup_id',)),
+      MaterialPageRoute(
+          builder: (context) => PDFScreen(
+                path: path,
+                status: 'pickup',
+                id: '$pickup_id',
+              )),
     );
+    if (received == 'pickupclient') {
+      Navigator.pop(context);
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PendingPickupItems()),
+      );
+    }
   }
 
   @override
@@ -143,7 +157,9 @@ class _PendingPickupItemsListState extends State<PendingPickupItemsList> {
                 child: new Text("View Challan"),
               ),
             ),
-            SizedBox(height: 20.0,),
+            SizedBox(
+              height: 20.0,
+            ),
           ],
         ));
   }

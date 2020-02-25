@@ -78,6 +78,16 @@ class PDFScreen extends StatelessWidget {
         print("status code :   $statusCode ");
         print(response.body);
       });
+
+      Toast.show(
+        "Items have been confirmed",
+        cntx,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.CENTER,
+        textColor: Colors.green,
+      );
+
+      Navigator.pop(cntx, 'pickupclient');
     } else if (status == 'return') {
       await http
           .post(Api_Config.confirmPendingReturnItems,
@@ -88,6 +98,16 @@ class PDFScreen extends StatelessWidget {
         print("status code :   $statusCode ");
         print(response.body);
       });
+
+      Toast.show(
+        "Items have been confirmed",
+        cntx,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.CENTER,
+        textColor: Colors.green,
+      );
+
+      Navigator.pop(cntx, 'returnclient');
     } else if (status == 'pickupdeliverymen') {
       await http
           .post(Api_Config.pickedItemsAddApi, headers: headerParams, body: data)

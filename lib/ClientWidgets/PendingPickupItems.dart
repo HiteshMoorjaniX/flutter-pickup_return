@@ -7,6 +7,7 @@ import 'package:pickup_return/ClientWidgets/PendingReturnItems.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
+import 'package:pickup_return/main.dart';
 
 class PendingPickupItems extends StatefulWidget {
   @override
@@ -23,6 +24,11 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
 
   @override
   Future<void> initState() {
+    // if (globals.authToken == null) {
+    //   Navigator.of(context).push(
+    //     new MaterialPageRoute(builder: (BuildContext context) => new MyApp()),
+    //   );
+    // }
     print('Inside pending client\'s pickup list');
     this.fetchPendingPickupItems();
     super.initState();
@@ -67,6 +73,7 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
             ),
             new ListTile(
                 title: new Text('Order History'),
+                trailing: new Icon(Icons.history),
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -78,7 +85,20 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
               title: new Text('Close'),
               trailing: new Icon(Icons.cancel),
               onTap: () => Navigator.of(context).pop(),
-            )
+            ),
+            new Divider(),
+            new ListTile(
+                title: new Text('Logout'),
+                trailing: new Icon(Icons.account_circle),
+                onTap: () {
+                  globals.authToken = null;
+                  Navigator.of(context).pop();
+
+                  Navigator.of(context).push(
+                    new MaterialPageRoute(
+                        builder: (BuildContext context) => new MyApp()),
+                  );
+                }),
           ],
         ),
       ),
@@ -135,7 +155,7 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
 
   Future<String> fetchPendingPickupItems() async {
     await http
-        .post(Api_Config.showPendingPickupItems, headers: headerParams)
+        .get(Api_Config.showPendingPickupItems, headers: headerParams)
         .then((http.Response response) {
       final int statusCode = response.statusCode;
 

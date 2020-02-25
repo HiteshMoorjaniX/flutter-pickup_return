@@ -252,7 +252,7 @@ class _PickupItemsState extends State<PickupItems> {
 
   Future<String> pickSelectedItems(context) async {
     var listForChallan = [];
-
+    var grand_total = 0;
     Map<String, String> headerParams = {
       "Accept": 'application/json',
       "Authorization": "Bearer ${globals.authToken}",
@@ -263,10 +263,12 @@ class _PickupItemsState extends State<PickupItems> {
       int q = int.parse(_quantityController[i].text);
       if (q > 0) {
         print(data[i]['item_name']);
+        grand_total = grand_total + (data[i]['price']*q);
         listForChallan.add({
           'item_name': data[i]['item_name'],
           'item_id': data[i]['id'],
-          'item_qua': q
+          'item_qua': q,
+          'price' : data[i]['price']*q,
         });
         print(_quantityController[i].text);
         var item_id = data[i]['id'];
@@ -334,7 +336,7 @@ class _PickupItemsState extends State<PickupItems> {
     // file.writeAsBytesSync(pdf.save());
     print('list is :');
     print(listForChallan);
-    String path = await challan.generatePdf(listForChallan);
+    String path = await challan.generatePdf(listForChallan,grand_total);
 
     String received = await Navigator.push(
       context,
@@ -392,8 +394,12 @@ class _PickupItemsState extends State<PickupItems> {
   }
 
   Future<String> fetchPickupItems() async {
+    var body = {
+      'client_id' : '${globals.clientId}',
+    };
+
     var authToken = globals.authToken;
-    var response = await http.get(pickupItemsUrl,
+    var response = await http.post(pickupItemsUrl,body: body,
         headers: {"Authorization": "Bearer " "$authToken"});
 
     print(response.body);

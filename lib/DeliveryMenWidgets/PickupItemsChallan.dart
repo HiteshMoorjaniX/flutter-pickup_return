@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-generatePdf(listForChallan) async {
+generatePdf(listForChallan, grand_total) async {
   final Document pdf = Document();
   List data = listForChallan;
   print('data is :');
@@ -47,16 +47,21 @@ generatePdf(listForChallan) async {
                       Text('Pickup Item Challan', textScaleFactor: 2),
                       PdfLogo()
                     ])),
-            
-            
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Item id', 'Item Name', 'Item Quantity'],
-              ...data.map(
-                (item) => [item['item_id'].toString(), item['item_name'].toString(), item['item_qua'].toString()]
-              )
+              <String>['Item id', 'Item Name', 'Item Quantity', 'Price'],
+              ...data.map((item) => [
+                    item['item_id'].toString(),
+                    item['item_name'].toString(),
+                    item['item_qua'].toString(),
+                    item['price'].toString()
+                  ])
             ]),
             Padding(padding: const EdgeInsets.all(10)),
             
+            Table.fromTextArray(context: context, data: <List<String>>[
+              <String>['Grand Total'],
+              <String>['$grand_total']
+            ]),
           ]));
 
   final String dir = (await getApplicationDocumentsDirectory()).path;

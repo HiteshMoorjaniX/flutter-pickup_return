@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pickup_return/ClientWidgets/PendingReturnItems.dart';
 import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
-import 'package:pickup_return/ClientWidgets/PendingReturnItemsChallan.dart' as challan;
+import 'package:pickup_return/ClientWidgets/PendingReturnItemsChallan.dart'
+    as challan;
 
 class PendingReturnItemsList extends StatefulWidget {
   final int return_id;
@@ -72,11 +74,24 @@ class _PendingReturnItemsListState extends State<PendingReturnItemsList> {
     path = await challan.generatePdf(data, grand_total);
   }
 
-  viewChallan() {
-    Navigator.push(
+  viewChallan() async {
+    String received = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PDFScreen(path: path,status: 'return',id: '$return_id',)),
+      MaterialPageRoute(
+          builder: (context) => PDFScreen(
+                path: path,
+                status: 'return',
+                id: '$return_id',
+              )),
     );
+
+    if (received == 'returnclient') {
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PendingReturnItems()),
+      );
+    }
   }
 
   @override

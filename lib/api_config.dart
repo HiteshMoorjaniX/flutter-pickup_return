@@ -14,5 +14,8 @@ var showPendingReturnItems = 'https://prm.gatetouch.com/api/get-return-pending';
 var showPendingPickupItemsThroughPickupId = 'https://prm.gatetouch.com/api/get-pickup-item';
 var showPendingReturnItemsThroughReturnId = 'https://prm.gatetouch.com/api/get-return-item';
 
-var confirmPendingPickupItems = 'https://prm.gatetouch.com/api/confom-pikup-status';
-var confirmPendingReturnItems = 'https://prm.gatetouch.com/api/confom-return-status';
+var confirmPendingPickupItems = 'https://prm.gatetouch.com/api/confirm-pickup-status';
+var confirmPendingReturnItems = 'https://prm.gatetouch.com/api/confirm-return-status';
+
+var clientHistory = 'https://prm.gatetouch.com/api/client-history';
+var deliveryboyHistory = 'https://prm.gatetouch.com/api/delivery-boy-history';

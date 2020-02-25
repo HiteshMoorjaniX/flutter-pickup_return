@@ -86,7 +86,7 @@ class _PendingReturnItemsState extends State<PendingReturnItems> {
 
   Future<String> fetchPendingReturnItems() async {
     await http
-        .post(Api_Config.showPendingReturnItems, headers: headerParams)
+        .get(Api_Config.showPendingReturnItems, headers: headerParams)
         .then((http.Response response) {
       final int statusCode = response.statusCode;
 

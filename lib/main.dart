@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'ClientWidgets/PendingPickupItems.dart';
 import 'DeliveryMenWidgets/ClientList.dart';
@@ -9,6 +10,7 @@ import 'login.dart';
 import 'globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'api_config.dart' as Api_Config;
+
 
 void main() => runApp(MaterialApp(
   home: MyApp(),
@@ -27,9 +29,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isSelected = false;
   Future<Login> login;
-
-
-
+  
   void _radio() {
     setState(() {
       _isSelected = !_isSelected;
@@ -247,11 +247,15 @@ class _MyAppState extends State<MyApp> {
                                 print("Helloo");
                                 var status = await fetchLogin(body: lg.toMap());
                                 if(status == 'deliveryboy'){
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  prefs?.setBool("isLoggedIn", true);
                                   //Navigator.push(context, MaterialPageRoute(builder: (context) => PickupItem()),);
                                   //Navigator.push(context, MaterialPageRoute(builder: (context) => ClientList(), settings: RouteSettings(arguments: token)),);
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => ClientList()),);
                                 }
                                 else if(status == 'client'){
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  prefs?.setBool("isLoggedIn", true);
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => PendingPickupItems()),);
                                 }
                                 else{
