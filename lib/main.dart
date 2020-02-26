@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pickup_return/ClientWidgets/ClientRegistration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'ClientWidgets/PendingPickupItems.dart';
@@ -296,7 +297,7 @@ class _MyAppState extends State<MyApp> {
                     ],
                   ),*/
                   SizedBox(
-                    height: ScreenUtil.getInstance().setHeight(40),
+                    height: ScreenUtil.getInstance().setHeight(10),
                   ),
                   /*Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -346,13 +347,13 @@ class _MyAppState extends State<MyApp> {
                   //       "New User? ",
                   //       style: TextStyle(fontFamily: "Poppins-Medium"),
                   //     ),
-                  //     InkWell(
-                  //       onTap: () {},
-                  //       child: Text("SignUp",
-                  //           style: TextStyle(
-                  //               color: Color(0xFF5d74e3),
-                  //               fontFamily: "Poppins-Bold")),
-                  //     )
+                      InkWell(
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ClientRegistration()),),
+                        child: Text("SignUp (Only for clients).",
+                            style: TextStyle(
+                                color: Color(0xFF5d74e3),
+                                fontFamily: "Poppins-Bold")),
+                      )
                   //   ],
                   // )
                 ],
