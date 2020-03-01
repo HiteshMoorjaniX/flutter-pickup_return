@@ -19,3 +19,6 @@ var confirmPendingReturnItems = 'https://prm.gatetouch.com/api/confirm-return-st
 
 var clientHistory = 'https://prm.gatetouch.com/api/client-history';
 var deliveryboyHistory = 'https://prm.gatetouch.com/api/delivery-boy-history';
+
+var citiesAndStates = 'https://prm.gatetouch.com/api/get-state-city';
+var clientRegistration = 'https://prm.gatetouch.com/api/client-registration';

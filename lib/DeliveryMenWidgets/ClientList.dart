@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:pickup_return/DeliveryMenWidgets/DeliveryboyOrderHistory.dart';
+import 'package:pickup_return/DeliveryMenWidgets/DeliveryboyPickupOrderHistory.dart';
+import 'package:pickup_return/DeliveryMenWidgets/DeliveryboyReturnOrderHistory.dart';
 import 'package:pickup_return/DeliveryMenWidgets/FancyPopup.dart';
 
 // import 'package:flutter_app/Widgets/FancyPopup.dart';
@@ -64,13 +65,22 @@ class _ClientListState extends State<ClientList> {
                       builder: (BuildContext context) => new ClientList()));
                 }),
             new ListTile(
-                title: new Text('Order History'),
+                title: new Text('Pickup Order History'),
                 trailing: new Icon(Icons.history),
                 onTap: () {
                   //Navigator.of(context).pop();
                   Navigator.of(context).push(new MaterialPageRoute(
                       builder: (BuildContext context) =>
-                          new DeliveryboyOrderHistory()));
+                          new DeliveryboyPickupOrderHistory()));
+                }),
+                new ListTile(
+                title: new Text('Return Order History'),
+                trailing: new Icon(Icons.history),
+                onTap: () {
+                  //Navigator.of(context).pop();
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new DeliveryboyReturnOrderHistory()));
                 }),
             new Divider(),
             new ListTile(
@@ -79,23 +89,23 @@ class _ClientListState extends State<ClientList> {
               onTap: () => Navigator.of(context).pop(),
             ),
             new Divider(),
-            new ListTile(
-                title: new Text('Logout'),
-                trailing: new Icon(Icons.account_circle),
-                onTap: () {
-                  globals.authToken = null;
-                  Navigator.of(context).pop();
+            // new ListTile(
+            //     title: new Text('Logout'),
+            //     trailing: new Icon(Icons.account_circle),
+            //     onTap: () {
+            //       globals.authToken = null;
+            //       Navigator.of(context).pop();
 
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => MyApp()));
+            //       Navigator.pushReplacement(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (BuildContext context) => MyApp()));
 
-                  // Navigator.of(context).push(
-                  //   new MaterialPageRoute(
-                  //       builder: (BuildContext context) => new MyApp()),
-                  // );
-                }),
+            //       // Navigator.of(context).push(
+            //       //   new MaterialPageRoute(
+            //       //       builder: (BuildContext context) => new MyApp()),
+            //       // );
+            //     }),
           ],
         ),
       ),

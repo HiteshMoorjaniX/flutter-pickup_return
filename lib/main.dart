@@ -262,7 +262,7 @@ class _MyAppState extends State<MyApp> {
                                 else{
                                   Toast.show("Invalid Username/Password",
                                       context,
-                                      duration: Toast.LENGTH_LONG,
+                                      duration: 4,
                                       gravity:  Toast.CENTER,
                                       textColor: Colors.red,
                                   );

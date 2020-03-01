@@ -1,5 +1,14 @@
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:pickup_return/ClientWidgets/HomePage.dart';
+import 'package:pickup_return/ClientWidgets/PendingPickupItems.dart';
+import 'package:pickup_return/api_config.dart' as Api_Config;
+import 'package:pickup_return/globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'package:pickup_return/main.dart';
+import 'package:toast/toast.dart';
 
 class RegisterPage extends StatefulWidget {
   static String tag = 'register-page';
@@ -9,8 +18,27 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  String dropdownValue = 'Gujarat';
-  String dropdownValuecity = 'Vadodara';
+  String dropdownValue = 'Select State';
+  String dropdownValuecity = 'Select City';
+  List data = ['Select State'];
+  List citiesData = ['Select City'];
+  var convertDataToJson;
+
+  final companyNameText = TextEditingController();
+  final firstNameText = TextEditingController();
+  final lastNameText = TextEditingController();
+
+  final cellPhoneText = TextEditingController();
+  final emailText = TextEditingController();
+  final passwordText = TextEditingController();
+
+  @override
+  void initState() {
+    fetchCitiesAndStates();
+    // citiesData = List.from(citiesData)..addAll(data);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final logo = Hero(
@@ -24,6 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     final companyName = TextFormField(
       keyboardType: TextInputType.text,
+      controller: companyNameText,
       autofocus: false,
       // initialValue: 'alucard@gmail.com',
       decoration: InputDecoration(
@@ -35,6 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     final firstName = TextFormField(
       keyboardType: TextInputType.text,
+      controller: firstNameText,
       autofocus: false,
       // initialValue: 'alucard@gmail.com',
       decoration: InputDecoration(
@@ -45,6 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     final lastName = TextFormField(
+      controller: lastNameText,
       keyboardType: TextInputType.text,
       autofocus: false,
       // initialValue: 'alucard@gmail.com',
@@ -56,6 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     final cellPhone = TextFormField(
+      controller: cellPhoneText,
       keyboardType: TextInputType.phone,
       autofocus: false,
       // initialValue: 'alucard@gmail.com',
@@ -67,8 +99,10 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     final email = TextFormField(
+      controller: emailText,
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
+
       // initialValue: 'alucard@gmail.com',
       decoration: InputDecoration(
         hintText: 'Email',
@@ -78,6 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     final password = TextFormField(
+      controller: passwordText,
       autofocus: false,
       // initialValue: 'some password',
       obscureText: true,
@@ -88,68 +123,122 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
 
+    List<DropdownMenuItem> states = data.map((item) {
+      return DropdownMenuItem(
+        child: Text(item),
+        value: item,
+      );
+    }).toList();
+
+    if (states.isEmpty) {
+      states = [
+        DropdownMenuItem(
+          child: Text(dropdownValue),
+          value: dropdownValue,
+        )
+      ];
+    }
+
+    final state = DropdownButton(
+      items: states,
+      onChanged: (newVal) => setState(() => {
+            dropdownValuecity = 'Select City',
+            citiesData = ['Select City'],
+            dropdownValue = newVal,
+            citiesData = List.from(citiesData)
+              ..addAll(convertDataToJson['data'][newVal]),
+            print(convertDataToJson['data'][newVal]),
+            print('cities data : '),
+            print(citiesData),
+          }),
+      value: dropdownValue,
+    );
+
+    List<DropdownMenuItem> cities = citiesData.map((item) {
+      return DropdownMenuItem(
+        child: Text(item),
+        value: item,
+      );
+    }).toList();
+
+    if (cities.isEmpty) {
+      cities = [
+        DropdownMenuItem(
+          child: Text(dropdownValuecity),
+          value: dropdownValuecity,
+        )
+      ];
+    }
+
+    final city = DropdownButton(
+      items: cities,
+      onChanged: (newVal) => setState(() => {
+            dropdownValuecity = newVal,
+          }),
+      value: dropdownValuecity,
+    );
+
     // final state = Padding(
     //   padding: EdgeInsets.only(left: 12.0),
-     final state = DropdownButton<String>(
-        value: dropdownValue,
-        // icon: Icon(Icons.arrow_downward),
-        iconSize: 24,
-        elevation: 24,
-        style: TextStyle(color: Colors.lightBlueAccent),
-        underline: Container(
-          // padding: EdgeInsets.all(20.0),
-          height: 2,
-          margin: EdgeInsets.only(left: 10.0,right: 5.0),
-          color: Colors.lightBlueAccent,
-        ),
-        onChanged: (String newValue) {
-          setState(() {
-            dropdownValue = newValue;
-          });
-        },
-        items: <String>['Gujarat', 'Maharashtra', 'Rajasthan', 'Uttarakhand']
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: SizedBox(
-              width: 100.0, // for example
-              child: Text(value, textAlign: TextAlign.center),
-            ),
-          );
-        }).toList(),
-      
-    );
+    //  final state = DropdownButton<String>(
+    //     value: dropdownValue,
+    //     // icon: Icon(Icons.arrow_downward),
+    //     iconSize: 24,
+    //     elevation: 24,
+    //     style: TextStyle(color: Colors.lightBlueAccent),
+    //     underline: Container(
+    //       // padding: EdgeInsets.all(20.0),
+    //       height: 2,
+    //       margin: EdgeInsets.only(left: 10.0,right: 5.0),
+    //       color: Colors.lightBlueAccent,
+    //     ),
+    //     onChanged: (String newValue) {
+    //       setState(() {
+    //         dropdownValue = newValue;
+    //       });
+    //     },
+    //     items: data
+    //         .map((value) {
+    //       return DropdownMenuItem<String>(
+    //         value: value,
+    //         child: SizedBox(
+    //           width: 100.0, // for example
+    //           child: Text(value, textAlign: TextAlign.center),
+    //         ),
+    //       );
+    //     }).toList(),
 
-    final city = DropdownButton<String>(
-        value: dropdownValuecity,
-        // icon: Icon(Icons.arrow_downward),
-        iconSize: 24,
-        elevation: 24,
-        style: TextStyle(color: Colors.lightBlueAccent),
-        underline: Container(
-          // padding: EdgeInsets.all(20.0),
-          height: 2,
-          margin: EdgeInsets.only(left: 10.0,right: 5.0),
-          color: Colors.lightBlueAccent,
-        ),
-        onChanged: (String newValue) {
-          setState(() {
-            dropdownValuecity = newValue;
-          });
-        },
-        items: <String>['Vadodara', 'Mumbai', 'Jaipur', 'Dehradun']
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: SizedBox(
-              width: 100.0, // for example
-              child: Text(value, textAlign: TextAlign.center),
-            ),
-          );
-        }).toList(),
-      
-    );
+    // );
 
+    // final city = DropdownButton<String>(
+    //     value: dropdownValuecity,
+    //     // icon: Icon(Icons.arrow_downward),
+    //     iconSize: 24,
+    //     elevation: 24,
+    //     style: TextStyle(color: Colors.lightBlueAccent),
+    //     underline: Container(
+    //       // padding: EdgeInsets.all(20.0),
+    //       height: 2,
+    //       margin: EdgeInsets.only(left: 10.0,right: 5.0),
+    //       color: Colors.lightBlueAccent,
+    //     ),
+    //     onChanged: (String newValue) {
+    //       setState(() {
+    //         dropdownValuecity = newValue;
+    //       });
+    //     },
+    //     items: <String>['Vadodara', 'Mumbai', 'Jaipur', 'Dehradun']
+    //         .map<DropdownMenuItem<String>>((String value) {
+    //       return DropdownMenuItem<String>(
+    //         value: value,
+    //         child: SizedBox(
+    //           width: 100.0, // for example
+    //           child: Text(value, textAlign: TextAlign.center),
+    //         ),
+    //       );
+    //     }).toList(),
+
+    // );
 
     final registerButton = Padding(
       padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -158,7 +247,8 @@ class _RegisterPageState extends State<RegisterPage> {
           borderRadius: BorderRadius.circular(24),
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed(HomePage.tag);
+          this.clientRegistration();
+          // Navigator.of(context).pushNamed(HomePage.tag);
         },
         padding: EdgeInsets.all(12),
         color: Colors.lightBlueAccent,
@@ -202,5 +292,135 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  fetchCitiesAndStates() async {
+    await http.get(Api_Config.citiesAndStates).then((http.Response response) {
+      final int statusCode = response.statusCode;
+
+      print("status code :   $statusCode ");
+      // print(response.body);
+
+      // var sample = {
+      //   "data" : {
+      //     "Maharashtra":[{"city":"Mumbai"},{"city":"Pune"}],
+      //     "Gujarat":[{"city":"Vadodara"},{"city":"Surat"}],
+
+      //   }
+      // };
+
+      // print(sample['data'][0]);
+      setState(() {
+        convertDataToJson = json.decode(response.body);
+        convertDataToJson['data'].forEach((k, v) => {
+              print(k),
+              data.add(k),
+            });
+      });
+
+      print('test : ');
+      print(convertDataToJson['data']['Gujarat']);
+      print(convertDataToJson);
+
+      convertDataToJson.forEach((k, v) => print('${k}'));
+    });
+  }
+
+  Future<void> clientRegistration() async {
+    String passwordPattern =
+        r'^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+
+    RegExp regExp = new RegExp(passwordPattern);
+    bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(emailText.text);
+    bool cellValid = RegExp(r"^[0-9]{8,25}").hasMatch(cellPhoneText.text);
+    if (regExp.hasMatch(passwordText.text) &&
+        emailValid &&
+        cellValid &&
+        companyNameText.text.isNotEmpty &&
+        firstNameText.text.isNotEmpty &&
+        lastNameText.text.isNotEmpty) {
+      var body = {
+        'company_name': companyNameText.text,
+        'first_name': firstNameText.text,
+        'last_name': lastNameText.text,
+        'cell_phone': cellPhoneText.text,
+        'email': emailText.text,
+        'password': passwordText.text,
+        'state': dropdownValue,
+        'city': dropdownValuecity,
+      };
+      await http
+          .post(Api_Config.clientRegistration, body: body)
+          .then((http.Response response) {
+        final int statusCode = response.statusCode;
+        print(statusCode);
+        print(response.body);
+        if (statusCode == 201) {
+          Toast.show(
+            "Registration successfully completed!",
+            context,
+            duration: 2,
+            gravity: Toast.CENTER,
+            textColor: Colors.yellowAccent,
+          );
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => MyApp()));
+        }
+      });
+    } else {
+      if (companyNameText.text.isEmpty) {
+        Toast.show(
+          "Company name is required field",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.yellowAccent,
+        );
+      } else if (firstNameText.text.isEmpty) {
+        Toast.show(
+          "First name is required field.",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.yellowAccent,
+        );
+      } else if (lastNameText.text.isEmpty) {
+        Toast.show(
+          "Last name is required field.",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.yellowAccent,
+        );
+      } else if (!cellValid) {
+        Toast.show(
+          "The cell phone must be between 8 and 25 digits.",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.yellowAccent,
+        );
+      } else if (!emailValid) {
+        Toast.show(
+          "Please enter valid Email Address",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.yellowAccent,
+        );
+      } else if (!regExp.hasMatch(passwordText.text)) {
+        Toast.show(
+          "Password must be 6 character containig special symbol and alpha nuumeric character",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.yellowAccent,
+        );
+      }
+    }
   }
 }

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:pickup_return/ClientWidgets/ClientOrdersHistory.dart';
+import 'package:pickup_return/ClientWidgets/ClientPickupOrdersHistory.dart';
+import 'package:pickup_return/ClientWidgets/ClientReturnOrdersHistory.dart';
 import 'package:pickup_return/ClientWidgets/PendingPickupItemsList.dart';
 import 'package:pickup_return/ClientWidgets/PendingReturnItems.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
@@ -68,17 +69,26 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
                       builder: (BuildContext context) =>
                           new PendingReturnItems()));
                 }),
+            // new ListTile(
+            //   title: new Text('Request for new Items'),
+            // ),
             new ListTile(
-              title: new Text('Request for new Items'),
-            ),
-            new ListTile(
-                title: new Text('Order History'),
+                title: new Text('Pickup Orders History'),
                 trailing: new Icon(Icons.history),
                 onTap: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).push(new MaterialPageRoute(
                       builder: (BuildContext context) =>
-                          new ClientOrdersHistory()));
+                          new ClientPickupOrdersHistory()));
+                }),
+                new ListTile(
+                title: new Text('Return Orders History'),
+                trailing: new Icon(Icons.history),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          new ClientReturnOrdersHistory()));
                 }),
             new Divider(),
             new ListTile(
@@ -87,18 +97,18 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
               onTap: () => Navigator.of(context).pop(),
             ),
             new Divider(),
-            new ListTile(
-                title: new Text('Logout'),
-                trailing: new Icon(Icons.account_circle),
-                onTap: () {
-                  globals.authToken = null;
-                  Navigator.of(context).pop();
+            // new ListTile(
+            //     title: new Text('Logout'),
+            //     trailing: new Icon(Icons.account_circle),
+            //     onTap: () {
+            //       globals.authToken = null;
+            //       Navigator.of(context).pop();
 
-                  Navigator.of(context).push(
-                    new MaterialPageRoute(
-                        builder: (BuildContext context) => new MyApp()),
-                  );
-                }),
+            //       Navigator.of(context).push(
+            //         new MaterialPageRoute(
+            //             builder: (BuildContext context) => new MyApp()),
+            //       );
+            //     }),
           ],
         ),
       ),

@@ -166,7 +166,7 @@ class _ReturnItemsState extends State<ReturnItems> {
 
   Future<String> returnSelectedItems() async {
     var listForChallan = [];
-
+    var grand_total = 0.0;
     print(_quantityController.length);
 
     var jsonArr = [];
@@ -176,6 +176,7 @@ class _ReturnItemsState extends State<ReturnItems> {
       int q = int.parse(_quantityController[i].text);
       if (q > 0) {
         print(data[i]['item_name']);
+        grand_total = grand_total + (data[i]['price']*q);
         print(_quantityController[i].text);
         var item_id = data[i]['items_id'];
         var pickup_id = data[i]['pickup_id'];
@@ -183,6 +184,7 @@ class _ReturnItemsState extends State<ReturnItems> {
           'item_id': item_id,
           'item_name': data[i]['item_name'],
           'item_qua': q,
+          'price' : data[i]['price']*q,
         });
         jsonArr.add({'item_id': item_id, 'pickup_id': pickup_id, 'qty': q});
       }
@@ -209,7 +211,7 @@ class _ReturnItemsState extends State<ReturnItems> {
 
     print('list is :');
     print(listForChallan);
-    String path = await challan.generatePdf(listForChallan);
+    String path = await challan.generatePdf(listForChallan,grand_total);
 
     String received = await Navigator.push(
       context,
