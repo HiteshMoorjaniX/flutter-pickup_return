@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:pickup_return/DeliveryMenWidgets/PickupItemsChallan.dart'
     as challan;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PickupItems extends StatefulWidget {
   @override
@@ -189,22 +190,53 @@ class _PickupItemsState extends State<PickupItems> {
                 },
               ),
             ),
-            ButtonTheme(
-              //padding: EdgeInsets.all(5.0),
-              minWidth: 200.0,
-              height: 45.0,
-              child: RaisedButton(
-                // padding: const EdgeInsets.all(12.0),
-                textColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Colors.blue,
-                onPressed: () => pickSelectedItems(context),
-                //onPressed: this.pickSelectedItems(),
-                child: new Text("Pickup"),
-              ),
-            )
+            // ButtonTheme(
+            //   //padding: EdgeInsets.all(5.0),
+            //   minWidth: 200.0,
+            //   height: 45.0,
+            //   child: RaisedButton(
+            //     // padding: const EdgeInsets.all(12.0),
+            //     textColor: Colors.white,
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: new BorderRadius.circular(30.0)),
+            //     color: Colors.blue,
+            //     onPressed: () => pickSelectedItems(context),
+            //     //onPressed: this.pickSelectedItems(),
+            //     child: new Text("Pickup"),
+            //   ),
+            // )
 
+            InkWell(
+              child: Container(
+                width: ScreenUtil.getInstance().setWidth(300),
+                height: ScreenUtil.getInstance().setHeight(90),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Color(0xFF17ead9), Color(0xFF6078ea)]),
+                    borderRadius: BorderRadius.circular(6.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color(0xFF6078ea).withOpacity(.3),
+                          offset: Offset(0.0, 8.0),
+                          blurRadius: 8.0)
+                    ]),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => pickSelectedItems(context),
+                    child: Center(
+                      child: Text("Pickup",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: "Poppins-Bold",
+                              fontSize: 18,
+                              letterSpacing: 1.0)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+SizedBox(height: 10.0,),
             /*RaisedButton(
             color: Colors.lightBlueAccent,
             child: Center(
@@ -252,7 +284,7 @@ class _PickupItemsState extends State<PickupItems> {
 
   Future<String> pickSelectedItems(context) async {
     var listForChallan = [];
-    var grand_total = 0;
+    var grand_total = 0.0;
     Map<String, String> headerParams = {
       "Accept": 'application/json',
       "Authorization": "Bearer ${globals.authToken}",
@@ -263,12 +295,12 @@ class _PickupItemsState extends State<PickupItems> {
       int q = int.parse(_quantityController[i].text);
       if (q > 0) {
         print(data[i]['item_name']);
-        grand_total = grand_total + (data[i]['price']*q);
+        grand_total = grand_total + (data[i]['price'] * q);
         listForChallan.add({
           'item_name': data[i]['item_name'],
           'item_id': data[i]['id'],
           'item_qua': q,
-          'price' : data[i]['price']*q,
+          'price': data[i]['price'] * q,
         });
         print(_quantityController[i].text);
         var item_id = data[i]['id'];
@@ -336,7 +368,7 @@ class _PickupItemsState extends State<PickupItems> {
     // file.writeAsBytesSync(pdf.save());
     print('list is :');
     print(listForChallan);
-    String path = await challan.generatePdf(listForChallan,grand_total);
+    String path = await challan.generatePdf(listForChallan, grand_total);
 
     String received = await Navigator.push(
       context,
@@ -395,12 +427,15 @@ class _PickupItemsState extends State<PickupItems> {
 
   Future<String> fetchPickupItems() async {
     var body = {
-      'client_id' : '${globals.clientId}',
+      'client_id': '${globals.clientId}',
     };
 
-    var authToken = globals.authToken;
-    var response = await http.post(pickupItemsUrl,body: body,
-        headers: {"Authorization": "Bearer " "$authToken"});
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+
+    // var authToken = globals.authToken;
+    var response = await http.post(pickupItemsUrl,
+        body: body, headers: {"Authorization": "Bearer " "$authToken"});
 
     print(response.body);
 

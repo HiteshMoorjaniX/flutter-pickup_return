@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pickup_return/DeliveryMenWidgets/FetchPickupHistory.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeliveryboyPickupOrderHistory extends StatefulWidget {
   @override
@@ -16,10 +18,10 @@ class _DeliveryboyPickupOrderHistoryState
   static int page = 1;
   ScrollController _sc = new ScrollController();
   bool isLoading = false;
-  Map<String, String> headerParams = {
-    "Accept": 'application/json',
-    "Authorization": "Bearer ${globals.authToken}",
-  };
+  // Map<String, String> headerParams = {
+  //   "Accept": 'application/json',
+  //   "Authorization": "Bearer ${globals.authToken}",
+  // };
   List data;
   List users = new List();
 
@@ -63,6 +65,7 @@ class _DeliveryboyPickupOrderHistoryState
         if (index == users.length) {
           return _buildProgressIndicator();
         } else {
+          var pickup_id = users[index]['pickup_id'];
           return new ListTile(
             leading: CircleAvatar(
               radius: 30.0,
@@ -72,7 +75,10 @@ class _DeliveryboyPickupOrderHistoryState
               // ),
             ),
             title: Text(users[index]['company_name']),
-            subtitle: Text((users[index]['item_name'])),
+            subtitle: Text((users[index]['pickup_date'])),
+            onTap: () => {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FetchPickupHistory(pickup_id : pickup_id)),)
+            },
           );
         }
       },
@@ -92,7 +98,14 @@ class _DeliveryboyPickupOrderHistoryState
     );
   }
 
-  void _getMoreData(int index) async {
+  Future<void> _getMoreData(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+    Map<String, String> headerParams = {
+    "Accept": 'application/json',
+    "Authorization": "Bearer " "$authToken",
+  };
+  
     if (!isLoading) {
       setState(() {
         isLoading = true;
@@ -101,7 +114,9 @@ class _DeliveryboyPickupOrderHistoryState
       print(url);
       var body = {'status': 'pickup'};
       final response = await http.post(url, headers: headerParams, body: body);
+      print(response.body);
       var convertDataToJson = json.decode(response.body);
+
       List dataNew = convertDataToJson['data'];
       List tList = new List();
       for (int i = 0; i < dataNew.length; i++) {

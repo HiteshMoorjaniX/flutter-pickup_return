@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pickup_return/ClientWidgets/ClientRegistration.dart';
+import 'package:pickup_return/TermsConditions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'ClientWidgets/PendingPickupItems.dart';
@@ -12,11 +13,25 @@ import 'globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'api_config.dart' as Api_Config;
 
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var usertype = prefs.getString('usertype');
+  print(usertype);
+  if (usertype == 'deliveryboy') {
+    runApp(MaterialApp(home: ClientList(), debugShowCheckedModeBanner: false));
+  } else if (usertype == 'client') {
+    runApp(MaterialApp(
+        home: PendingPickupItems(navId: 0,), debugShowCheckedModeBanner: false));
+  } else {
+    runApp(MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false));
+  }
+}
 
-void main() => runApp(MaterialApp(
-  home: MyApp(),
-  debugShowCheckedModeBanner: false,
-));
+// void main() => runApp(MaterialApp(
+//       home: MyApp(),
+//       debugShowCheckedModeBanner: false,
+//     ));
 
 final loginText = TextEditingController();
 final passwordText = TextEditingController();
@@ -30,15 +45,14 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isSelected = false;
   Future<Login> login;
-  
+  bool agree = false;
   void _radio() {
     setState(() {
       _isSelected = !_isSelected;
     });
   }
 
-  Widget radioButton(bool isSelected) =>
-      Container(
+  Widget radioButton(bool isSelected) => Container(
         width: 16.0,
         height: 16.0,
         padding: EdgeInsets.all(2.0),
@@ -47,16 +61,15 @@ class _MyAppState extends State<MyApp> {
             border: Border.all(width: 2.0, color: Colors.black)),
         child: isSelected
             ? Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration:
-          BoxDecoration(shape: BoxShape.circle, color: Colors.black),
-        )
+                width: double.infinity,
+                height: double.infinity,
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: Colors.black),
+              )
             : Container(),
       );
 
-  Widget horizontalLine() =>
-      Padding(
+  Widget horizontalLine() => Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Container(
           width: ScreenUtil.getInstance().setWidth(120),
@@ -67,8 +80,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.instance = ScreenUtil.getInstance()
-      ..init(context);
+    ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance =
         ScreenUtil(width: 750, height: 1334, allowFontScaling: true);
     return new Scaffold(
@@ -81,10 +93,10 @@ class _MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child : Center(child: Image.asset("assets/logo2.png"),)
-                
-              ),
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Center(
+                    child: Image.asset("assets/logo-web-transparent.png"),
+                  )),
               Expanded(
                 child: Container(),
               ),
@@ -99,14 +111,13 @@ class _MyAppState extends State<MyApp> {
                   Row(
                     children: <Widget>[
                       SizedBox(
-                    height: ScreenUtil.getInstance().setHeight(180),
-                  ),
-
-                      Image.asset(
-                        "assets/logo2.png",
-                        width: ScreenUtil.getInstance().setWidth(110),
-                        height: ScreenUtil.getInstance().setHeight(110),
+                        height: ScreenUtil.getInstance().setHeight(180),
                       ),
+                      // Image.asset(
+                      //   "assets/logo-web-transparent.png",
+                      //   width: ScreenUtil.getInstance().setWidth(110),
+                      //   height: ScreenUtil.getInstance().setHeight(110),
+                      // ),
                       Text("",
                           style: TextStyle(
                               fontFamily: "Poppins-Bold",
@@ -138,8 +149,8 @@ class _MyAppState extends State<MyApp> {
                               blurRadius: 10.0),
                         ]),
                     child: Padding(
-                      padding: EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 16.0),
+                      padding:
+                          EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -154,8 +165,8 @@ class _MyAppState extends State<MyApp> {
                           Text("Username",
                               style: TextStyle(
                                   fontFamily: "Poppins-Medium",
-                                  fontSize: ScreenUtil.getInstance().setSp(
-                                      26))),
+                                  fontSize:
+                                      ScreenUtil.getInstance().setSp(26))),
                           TextField(
                             controller: loginText,
                             decoration: InputDecoration(
@@ -169,8 +180,8 @@ class _MyAppState extends State<MyApp> {
                           Text("PassWord",
                               style: TextStyle(
                                   fontFamily: "Poppins-Medium",
-                                  fontSize: ScreenUtil.getInstance().setSp(
-                                      26))),
+                                  fontSize:
+                                      ScreenUtil.getInstance().setSp(26))),
                           TextField(
                             controller: passwordText,
                             obscureText: true,
@@ -190,8 +201,8 @@ class _MyAppState extends State<MyApp> {
                                 style: TextStyle(
                                     color: Colors.blue,
                                     fontFamily: "Poppins-Medium",
-                                    fontSize: ScreenUtil.getInstance().setSp(
-                                        28)),
+                                    fontSize:
+                                        ScreenUtil.getInstance().setSp(28)),
                               )
                             ],
                           )
@@ -199,9 +210,33 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                   ),
-
-
-                  SizedBox(height: ScreenUtil.getInstance().setHeight(100)),
+                  SizedBox(height: ScreenUtil.getInstance().setHeight(20)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Checkbox(
+                        value: agree,
+                        onChanged: (bool value) {
+                          setState(() {
+                            print(value);
+                            agree = value;
+                          });
+                        },
+                      ),
+                      InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TermsConditions()),
+                        ),
+                        child: Text("I Agree with term and conditions.",
+                            style: TextStyle(
+                                color: Color(0xFF5d74e3),
+                                fontFamily: "Poppins-Bold")),
+                      )
+                    ],
+                  ),
+                  // SizedBox(height: ScreenUtil.getInstance().setHeight(100)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -242,31 +277,47 @@ class _MyAppState extends State<MyApp> {
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () async {
-                                Login lg = new Login(username: loginText.text,
+                                Login lg = new Login(
+                                    username: loginText.text,
                                     password: passwordText.text);
 
                                 print("Helloo");
                                 var status = await fetchLogin(body: lg.toMap());
-                                if(status == 'deliveryboy'){
-                                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                                  prefs?.setBool("isLoggedIn", true);
+                                if (status == 'deliveryboy') {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setString('usertype', 'deliveryboy');
+                                  prefs.setString(
+                                      'authToken', globals.authToken);
+                                  // prefs.setBool("isLoggedIn", true);
                                   //Navigator.push(context, MaterialPageRoute(builder: (context) => PickupItem()),);
                                   //Navigator.push(context, MaterialPageRoute(builder: (context) => ClientList(), settings: RouteSettings(arguments: token)),);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ClientList()),);
-                                }
-                                else if(status == 'client'){
-                                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                                  prefs?.setBool("isLoggedIn", true);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PendingPickupItems()),);
-                                }
-                                else{
-                                  Toast.show("Invalid Username/Password",
-                                      context,
-                                      duration: 4,
-                                      gravity:  Toast.CENTER,
-                                      textColor: Colors.red,
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ClientList()),
                                   );
-
+                                } else if (status == 'client') {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  // prefs.setBool("isLoggedIn", true);
+                                  prefs.setString('usertype', 'client');
+                                  prefs.setString(
+                                      'authToken', globals.authToken);
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            PendingPickupItems(navId: 0,)),
+                                  );
+                                } else {
+                                  Toast.show(
+                                    "Invalid Username/Password",
+                                    context,
+                                    duration: 4,
+                                    gravity: Toast.CENTER,
+                                    textColor: Colors.red,
+                                  );
                                 }
                               },
                               child: Center(
@@ -347,13 +398,17 @@ class _MyAppState extends State<MyApp> {
                   //       "New User? ",
                   //       style: TextStyle(fontFamily: "Poppins-Medium"),
                   //     ),
-                      InkWell(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ClientRegistration()),),
-                        child: Text("SignUp (Only for clients).",
-                            style: TextStyle(
-                                color: Color(0xFF5d74e3),
-                                fontFamily: "Poppins-Bold")),
-                      )
+                  InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ClientRegistration()),
+                    ),
+                    child: Text("SignUp (Only for clients).",
+                        style: TextStyle(
+                            color: Color(0xFF5d74e3),
+                            fontFamily: "Poppins-Bold")),
+                  )
                   //   ],
                   // )
                 ],
@@ -365,42 +420,42 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-  Future<String> fetchLogin({Map body}) async {
 
+Future<String> fetchLogin({Map body}) async {
   /*  var map = new Map<String, dynamic>();
     map["un"] = un;
     map["pass"] = pass;*/
 
-        
-        return http.post(Api_Config.loginApi, body: body
-        /*{
+  return http
+      .post(Api_Config.loginApi, body: body
+          /*{
 
           "un" : "" + loginText.text,
           "pass" : "" + passwordText.text
         }
         */
 
-        ).then((http.Response response) {
-          final int statusCode = response.statusCode;
-          print("status code :   $statusCode ");
-          //print("Response :" + response.body);
-          Map<String, dynamic> user = json.decode(response.body);
-          print("Access token :   ");
-          print(user['access_token']);
-          token = user['access_token'];
-          globals.authToken = token;
-          print(user['user']['id']);
-          print('User type : ');
-          print(user['user']['user_type']);
+          )
+      .then((http.Response response) {
+    final int statusCode = response.statusCode;
+    print("status code :   $statusCode ");
+    //print("Response :" + response.body);
+    Map<String, dynamic> user = json.decode(response.body);
+    print("Access token :   ");
+    print(user['access_token']);
+    token = user['access_token'];
+    globals.authToken = token;
+    print(user['user']['id']);
+    print('User type : ');
+    print(user['user']['user_type']);
 
-          if(statusCode == 200){
-            return user['user']['user_type'];
-          }
-          else{
-            return 'error';
-          }
+    if (statusCode == 200) {
+      return user['user']['user_type'];
+    } else {
+      return 'error';
+    }
 
-          /*Map<String, dynamic> user = json.decode(response.body);
+    /*Map<String, dynamic> user = json.decode(response.body);
           print(user);
           print(response.body);
           if(user['user']['id'] != null){
@@ -412,8 +467,7 @@ class _MyAppState extends State<MyApp> {
               return false;
             }*/
 
-          
-          /*if(user['status'] == 'true'){
+    /*if(user['status'] == 'true'){
             print('HOHHO');
             return true;
             //Navigator.push(context, route);
@@ -422,6 +476,5 @@ class _MyAppState extends State<MyApp> {
             print("HAHHA");
             return false;
           }*/
-        });
-
+  });
 }

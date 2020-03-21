@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/DeliveryMenWidgets/ReturnItemsChallan.dart'
     as challan;
 import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReturnItems extends StatefulWidget {
   @override
@@ -16,11 +18,6 @@ class ReturnItems extends StatefulWidget {
 class _ReturnItemsState extends State<ReturnItems> {
   List data;
   List<TextEditingController> _quantityController = new List();
-
-  Map<String, String> headerParams = {
-    "Accept": 'application/json',
-    "Authorization": "Bearer ${globals.authToken}",
-  };
 
   @override
   void initState() {
@@ -111,22 +108,55 @@ class _ReturnItemsState extends State<ReturnItems> {
                 },
               ),
             ),
-            ButtonTheme(
-              //padding: EdgeInsets.all(5.0),
-              minWidth: 200.0,
-              height: 45.0,
-              child: RaisedButton(
-                // padding: const EdgeInsets.all(12.0),
-                textColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Colors.blue,
-                onPressed: () => returnSelectedItems(),
-                //onPressed: this.pickSelectedItems(),
-                child: new Text("Return"),
-              ),
-            )
+            // ButtonTheme(
+            //   //padding: EdgeInsets.all(5.0),
+            //   minWidth: 200.0,
+            //   height: 45.0,
+            //   child: RaisedButton(
+            //     // padding: const EdgeInsets.all(12.0),
+            //     textColor: Colors.white,
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: new BorderRadius.circular(30.0)),
+            //     color: Colors.blue,
+            //     onPressed: () => returnSelectedItems(),
+            //     //onPressed: this.pickSelectedItems(),
+            //     child: new Text("Return"),
+            //   ),
+            // )
 
+            InkWell(
+              child: Container(
+                width: ScreenUtil.getInstance().setWidth(300),
+                height: ScreenUtil.getInstance().setHeight(90),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Color(0xFF17ead9), Color(0xFF6078ea)]),
+                    borderRadius: BorderRadius.circular(6.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color(0xFF6078ea).withOpacity(.3),
+                          offset: Offset(0.0, 8.0),
+                          blurRadius: 8.0)
+                    ]),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => returnSelectedItems(),
+                    child: Center(
+                      child: Text("Return",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: "Poppins-Bold",
+                              fontSize: 18,
+                              letterSpacing: 1.0)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
             /*RaisedButton(
             color: Colors.lightBlueAccent,
             child: Center(
@@ -176,7 +206,7 @@ class _ReturnItemsState extends State<ReturnItems> {
       int q = int.parse(_quantityController[i].text);
       if (q > 0) {
         print(data[i]['item_name']);
-        grand_total = grand_total + (data[i]['price']*q);
+        grand_total = grand_total + (data[i]['price'] * q);
         print(_quantityController[i].text);
         var item_id = data[i]['items_id'];
         var pickup_id = data[i]['pickup_id'];
@@ -184,7 +214,7 @@ class _ReturnItemsState extends State<ReturnItems> {
           'item_id': item_id,
           'item_name': data[i]['item_name'],
           'item_qua': q,
-          'price' : data[i]['price']*q,
+          'price': data[i]['price'] * q,
         });
         jsonArr.add({'item_id': item_id, 'pickup_id': pickup_id, 'qty': q});
       }
@@ -211,7 +241,7 @@ class _ReturnItemsState extends State<ReturnItems> {
 
     print('list is :');
     print(listForChallan);
-    String path = await challan.generatePdf(listForChallan,grand_total);
+    String path = await challan.generatePdf(listForChallan, grand_total);
 
     String received = await Navigator.push(
       context,
@@ -234,6 +264,14 @@ class _ReturnItemsState extends State<ReturnItems> {
   }
 
   Future<String> showPickedItemsList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+
+    Map<String, String> headerParams = {
+      "Accept": 'application/json',
+      "Authorization": "Bearer " "$authToken",
+    };
+
     var body = {
       "client_id": '${globals.clientId}',
     };
@@ -252,7 +290,7 @@ class _ReturnItemsState extends State<ReturnItems> {
       var convertDataToJson = json.decode(response.body);
       data = convertDataToJson['data'];
       print(data.length);
-      if(data.length == 0){
+      if (data.length == 0) {
         // Need to add code for empty list
       }
       print(data[0]['item_name']);

@@ -22,3 +22,8 @@ var deliveryboyHistory = 'https://prm.gatetouch.com/api/delivery-boy-history';
 
 var citiesAndStates = 'https://prm.gatetouch.com/api/get-state-city';
 var clientRegistration = 'https://prm.gatetouch.com/api/client-registration';
+
+var pickupHistory = 'https://prm.gatetouch.com/api/pickup-history';
+var returnHistory = 'https://prm.gatetouch.com/api/return-history';
+
+var termsAndConditions = 'https://prm.gatetouch.com/api/get-policy';

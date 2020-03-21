@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pickup_return/ClientWidgets/PendingPickupItems.dart';
 import 'package:pickup_return/ClientWidgets/PendingReturnItems.dart';
 import 'package:pickup_return/DeliveryMenWidgets/Challan.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
@@ -8,6 +10,7 @@ import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:pickup_return/ClientWidgets/PendingReturnItemsChallan.dart'
     as challan;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PendingReturnItemsList extends StatefulWidget {
   final int return_id;
@@ -22,12 +25,12 @@ class PendingReturnItemsList extends StatefulWidget {
 class _PendingReturnItemsListState extends State<PendingReturnItemsList> {
   String path;
 
-  var grand_total = 0;
+  var grand_total = 0.0;
 
-  Map<String, String> headerParams = {
-    "Accept": 'application/json',
-    "Authorization": "Bearer ${globals.authToken}",
-  };
+  // Map<String, String> headerParams = {
+  //   "Accept": 'application/json',
+  //   "Authorization": "Bearer ${globals.authToken}",
+  // };
   List data;
   int return_id;
 
@@ -40,6 +43,12 @@ class _PendingReturnItemsListState extends State<PendingReturnItemsList> {
   }
 
   Future<void> showPendingItems(return_id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+    Map<String, String> headerParams = {
+      "Accept": 'application/json',
+      "Authorization": "Bearer " "$authToken",
+    };
     print('Return id : ');
     print(return_id);
 
@@ -87,15 +96,20 @@ class _PendingReturnItemsListState extends State<PendingReturnItemsList> {
 
     if (received == 'returnclient') {
       Navigator.pop(context);
-      Navigator.push(
+      Navigator.pop(context);
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => PendingReturnItems()),
+        MaterialPageRoute(builder: (context) => PendingPickupItems(navId: 1,)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
+    ScreenUtil.instance =
+        ScreenUtil(width: 750, height: 1334, allowFontScaling: true);
+
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("Pending Return Items"),
@@ -144,21 +158,53 @@ class _PendingReturnItemsListState extends State<PendingReturnItemsList> {
                 },
               ),
             ),
-            ButtonTheme(
-              //padding: EdgeInsets.all(5.0),
-              minWidth: 200.0,
-              height: 45.0,
-              child: RaisedButton(
-                // padding: const EdgeInsets.all(12.0),
-                textColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0)),
-                color: Colors.blue,
-                onPressed: () => viewChallan(),
 
-                child: new Text("View Challan"),
+            InkWell(
+              child: Container(
+                width: ScreenUtil.getInstance().setWidth(300),
+                height: ScreenUtil.getInstance().setHeight(90),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Color(0xFF17ead9), Color(0xFF6078ea)]),
+                    borderRadius: BorderRadius.circular(6.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color(0xFF6078ea).withOpacity(.3),
+                          offset: Offset(0.0, 8.0),
+                          blurRadius: 8.0)
+                    ]),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => viewChallan(),
+                    child: Center(
+                      child: Text("View Challan",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: "Poppins-Bold",
+                              fontSize: 18,
+                              letterSpacing: 1.0)),
+                    ),
+                  ),
+                ),
               ),
             ),
+
+            // ButtonTheme(
+            //   //padding: EdgeInsets.all(5.0),
+            //   minWidth: 200.0,
+            //   height: 45.0,
+            //   child: RaisedButton(
+            //     // padding: const EdgeInsets.all(12.0),
+            //     textColor: Colors.white,
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: new BorderRadius.circular(30.0)),
+            //     color: Colors.blue,
+            //     onPressed: () => viewChallan(),
+
+            //     child: new Text("View Challan"),
+            //   ),
+            // ),
             SizedBox(
               height: 20.0,
             ),

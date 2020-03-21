@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pickup_return/DeliveryMenWidgets/FetchReturnHistory.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeliveryboyReturnOrderHistory extends StatefulWidget {
   @override
@@ -16,10 +18,7 @@ class _DeliveryboyReturnOrderHistoryState
   static int page = 1;
   ScrollController _sc = new ScrollController();
   bool isLoading = false;
-  Map<String, String> headerParams = {
-    "Accept": 'application/json',
-    "Authorization": "Bearer ${globals.authToken}",
-  };
+  
   List data;
   List users = new List();
 
@@ -63,6 +62,7 @@ class _DeliveryboyReturnOrderHistoryState
         if (index == users.length) {
           return _buildProgressIndicator();
         } else {
+          var return_id = users[index]['return_id'];
           return new ListTile(
             leading: CircleAvatar(
               radius: 30.0,
@@ -72,7 +72,10 @@ class _DeliveryboyReturnOrderHistoryState
               // ),
             ),
             title: Text(users[index]['company_name']),
-            subtitle: Text((users[index]['item_name'])),
+            subtitle: Text((users[index]['return_date'])),
+            onTap: () => {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FetchReturnHistory(return_id : return_id)),)
+            },
           );
         }
       },
@@ -93,6 +96,12 @@ class _DeliveryboyReturnOrderHistoryState
   }
 
   void _getMoreData(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+    Map<String, String> headerParams = {
+    "Accept": 'application/json',
+    "Authorization": "Bearer " "$authToken",
+  };
     if (!isLoading) {
       setState(() {
         isLoading = true;

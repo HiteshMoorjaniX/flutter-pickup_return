@@ -1,40 +1,44 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:pickup_return/ClientWidgets/FetchClientPickupHistory.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ClientPickupOrdersHistory extends StatefulWidget {
+class FetchReturnHistory extends StatefulWidget {
+  final int return_id;
+
+  const FetchReturnHistory({Key key, this.return_id}) : super(key: key);
   @override
-  _ClientPickupOrdersHistoryState createState() =>
-      _ClientPickupOrdersHistoryState();
+  _FetchReturnHistoryState createState() => _FetchReturnHistoryState(return_id);
 }
 
-class _ClientPickupOrdersHistoryState extends State<ClientPickupOrdersHistory> {
+class _FetchReturnHistoryState extends State<FetchReturnHistory> {
   static int page = 1;
   ScrollController _sc = new ScrollController();
   bool isLoading = false;
   
+  // Map<String, String> headerParams = {  
+  //   "Accept": 'application/json',
+  //   "Authorization": "Bearer ${globals.authToken}",
+  // };
   List data;
   List users = new List();
 
+  int return_id;
+  _FetchReturnHistoryState(this.return_id);
+
   @override
   void initState() {
-    this._getMoreData(page);
-    // fetchClientPickupOrders();
+    this._getMoreData(page, return_id);
     super.initState();
 
     _sc.addListener(() {
-      if (_sc.position.pixels ==
-          _sc.position.maxScrollExtent) {
-        _getMoreData(page);
+      if (_sc.position.pixels == _sc.position.maxScrollExtent) {
+        _getMoreData(page, return_id);
       }
     });
-
-
   }
 
   @override
@@ -48,7 +52,7 @@ class _ClientPickupOrdersHistoryState extends State<ClientPickupOrdersHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pickup Orders History"),
+        title: const Text("Return Orders History"),
       ),
       body: Container(
         child: _buildList(),
@@ -65,27 +69,19 @@ class _ClientPickupOrdersHistoryState extends State<ClientPickupOrdersHistory> {
         if (index == users.length) {
           return _buildProgressIndicator();
         } else {
-          var pickup_id = users[index]['pickup_id'];
           return new ListTile(
-            leading: CircleAvatar(
-              radius: 30.0,
-              backgroundImage: new AssetImage('assets/as.png'),
-              // backgroundImage: NetworkImage(
-              //   users[index]['picture']['large'],
-              // ),
-            ),
-            title: Text(users[index]['delivery_boy_name']),
-            subtitle: Text((users[index]['pickup_date'])),
-            onTap: () => {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => FetchClientPickupHistory(pickup_id : pickup_id)),)
-            },
+            title: Text(
+                'item name : ${users[index]['item_name']}, quantity: ${users[index]['quantity']} '),
+            subtitle: Text(('Price : ${users[index]['price']} ')),
+            // onTap: () => {
+            //   Navigator.push(context, MaterialPageRoute(builder: (context) => FetchPickupHistory()),)
+            // },
           );
         }
       },
       controller: _sc,
     );
   }
-
 
   Widget _buildProgressIndicator() {
     return new Padding(
@@ -99,27 +95,26 @@ class _ClientPickupOrdersHistoryState extends State<ClientPickupOrdersHistory> {
     );
   }
 
-  void _getMoreData(int index) async {
+  void _getMoreData(int index, return_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var authToken = prefs.getString('authToken');
     Map<String, String> headerParams = {
     "Accept": 'application/json',
     "Authorization": "Bearer " "$authToken",
   };
-
     if (!isLoading) {
       setState(() {
         isLoading = true;
       });
-      var url = '${Api_Config.clientHistory}?page=' + index.toString();
+      var url = '${Api_Config.returnHistory}?page=' + index.toString();
       print(url);
-      var body = {'status': 'pickup'};
+      var body = {'return_id': '${return_id}'};
       final response = await http.post(url, headers: headerParams, body: body);
       var convertDataToJson = json.decode(response.body);
       List dataNew = convertDataToJson['data'];
       List tList = new List();
       for (int i = 0; i < dataNew.length; i++) {
-        tList.add(dataNew[i]['delivery_boy_name']);
+        tList.add(dataNew[i]['item_name']);
       }
       print('tList  ');
       print(tList);
@@ -129,23 +124,5 @@ class _ClientPickupOrdersHistoryState extends State<ClientPickupOrdersHistory> {
         page++;
       });
     }
-  }
-
-  Future<void> fetchClientPickupOrders() async {
-    
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var authToken = prefs.getString('authToken');
-    Map<String, String> headerParams = {
-    "Accept": 'application/json',
-    "Authorization": "Bearer " "$authToken",
-  };
-    var body = {'status': 'pickup'};
-    await http
-        .post(Api_Config.clientHistory, headers: headerParams, body: body)
-        .then((http.Response response) {
-      final int statusCode = response.statusCode;
-      print('Status code : $statusCode');
-      print(response.body);
-    });
   }
 }
