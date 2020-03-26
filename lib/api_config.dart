@@ -27,3 +27,6 @@ var pickupHistory = 'https://prm.gatetouch.com/api/pickup-history';
 var returnHistory = 'https://prm.gatetouch.com/api/return-history';
 
 var termsAndConditions = 'https://prm.gatetouch.com/api/get-policy';
+var requestNewItem = 'https://prm.gatetouch.com/api/new-product-request';
+
+var changePassword = 'https://prm.gatetouch.com/api/change-password';

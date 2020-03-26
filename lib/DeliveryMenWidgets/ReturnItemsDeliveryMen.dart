@@ -75,6 +75,7 @@ class _ReturnItemsState extends State<ReturnItems> {
                                       new Expanded(
                                         //flex: 3,
                                         child: new TextField(
+                                          readOnly: true,
                                           style: TextStyle(color: Colors.amber),
                                           textAlign: TextAlign.end,
                                           decoration:

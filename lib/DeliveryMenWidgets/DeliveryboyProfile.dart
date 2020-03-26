@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pickup_return/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pickup_return/api_config.dart' as Api_Config;
+import 'package:http/http.dart' as http;
+import 'package:toast/toast.dart';
 
 class DeliveryboyProfile extends StatefulWidget {
   @override
@@ -12,9 +15,12 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
 
+  final currentPassword = TextEditingController();
+  final newPassword = TextEditingController();
+  final confirmNewPassword = TextEditingController();
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -44,7 +50,7 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
                     Padding(
                         padding: EdgeInsets.only(top: 30.0),
                         child: new Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             // new Icon(
                             //   Icons.arrow_back_ios,
@@ -60,52 +66,67 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
                                       fontFamily: 'sans-serif-light',
                                       color: Colors.black)),
                             ),
-                            Padding(
-                                padding: EdgeInsets.only(left: 190.0,top: 0.0),
-                                child: RaisedButton(
-                                  textColor: Colors.white,
-                                  color: Colors.blueAccent,
-                                  child: Text('Logout'),
-                                  onPressed: () async {
-                                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                                    prefs.remove('usertype');
-                                    prefs.remove('authToken');
-                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext cntx) => MyApp()));
-                                  },
-                                )
-                                // Container(
-                                //   width: ScreenUtil.getInstance().setWidth(330),
-                                //   height: ScreenUtil.getInstance().setHeight(100),
-                                //   decoration: BoxDecoration(
-                                //       gradient: LinearGradient(colors: [
-                                //         Color(0xFF17ead9),
-                                //         Color(0xFF6078ea)
-                                //       ]),
-                                //       borderRadius: BorderRadius.circular(6.0),
-                                //       boxShadow: [
-                                //         BoxShadow(
-                                //             color:
-                                //                 Color(0xFF6078ea).withOpacity(.3),
-                                //             offset: Offset(0.0, 8.0),
-                                //             blurRadius: 8.0)
-                                //       ]),
-                                //   child: Material(
-                                //     color: Colors.transparent,
-                                //     child: InkWell(
-                                //       onTap: () {},
-                                //       child: Center(
-                                //         child: Text("SIGNIN",
-                                //             style: TextStyle(
-                                //                 color: Colors.white,
-                                //                 fontFamily: "Poppins-Bold",
-                                //                 fontSize: 18,
-                                //                 letterSpacing: 1.0)),
-                                //       ),
-                                //     ),
-                                //   ),
-                                // )
-
+                            Align(
+                              alignment: AlignmentDirectional.topEnd,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 140.0, top: 0.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: <Widget>[
+                                    RaisedButton(
+                                      textColor: Colors.white,
+                                      color: Colors.blueAccent,
+                                      child: Text('Logout'),
+                                      onPressed: () async {
+                                        SharedPreferences prefs =
+                                            await SharedPreferences
+                                                .getInstance();
+                                        prefs.remove('usertype');
+                                        prefs.remove('authToken');
+                                        Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (BuildContext cntx) =>
+                                                    MyApp()));
+                                      },
+                                    )
+                                  ],
                                 ),
+                              ),
+                            )
+
+                            // child:
+                            // Container(
+                            //   width: ScreenUtil.getInstance().setWidth(330),
+                            //   height: ScreenUtil.getInstance().setHeight(100),
+                            //   decoration: BoxDecoration(
+                            //       gradient: LinearGradient(colors: [
+                            //         Color(0xFF17ead9),
+                            //         Color(0xFF6078ea)
+                            //       ]),
+                            //       borderRadius: BorderRadius.circular(6.0),
+                            //       boxShadow: [
+                            //         BoxShadow(
+                            //             color:
+                            //                 Color(0xFF6078ea).withOpacity(.3),
+                            //             offset: Offset(0.0, 8.0),
+                            //             blurRadius: 8.0)
+                            //       ]),
+                            //   child: Material(
+                            //     color: Colors.transparent,
+                            //     child: InkWell(
+                            //       onTap: () {},
+                            //       child: Center(
+                            //         child: Text("SIGNIN",
+                            //             style: TextStyle(
+                            //                 color: Colors.white,
+                            //                 fontFamily: "Poppins-Bold",
+                            //                 fontSize: 18,
+                            //                 letterSpacing: 1.0)),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // )
                           ],
                         )),
                     Padding(
@@ -211,7 +232,7 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
                             children: <Widget>[
                               new Flexible(
                                 child: TextField(
-                                  // controller: passwordText,
+                                  controller: currentPassword,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                       hintText: "Current Password",
@@ -249,7 +270,7 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
                             children: <Widget>[
                               new Flexible(
                                 child: TextField(
-                                  // controller: passwordText,
+                                  controller: newPassword,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                       hintText: "New Password",
@@ -287,7 +308,7 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
                             children: <Widget>[
                               new Flexible(
                                 child: TextField(
-                                  // controller: passwordText,
+                                  controller: confirmNewPassword,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                       hintText: "Confirm New Password",
@@ -331,12 +352,7 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
                 child: new Text("Save"),
                 textColor: Colors.white,
                 color: Colors.green,
-                onPressed: () {
-                  setState(() {
-                    _status = true;
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                  });
-                },
+                onPressed: () => save(),
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(20.0)),
               )),
@@ -366,6 +382,57 @@ class _DeliveryboyProfileState extends State<DeliveryboyProfile> {
         ],
       ),
     );
+  }
+
+  Future<void> save() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+    Map<String, String> headerParams = {
+      "Accept": 'application/json',
+      "Authorization": "Bearer " "$authToken",
+    };
+    var body = {
+      "current_password": currentPassword.text,
+      'password': newPassword.text,
+      'password_confirmation': confirmNewPassword.text
+    };
+
+    await http
+        .post(Api_Config.changePassword, headers: headerParams, body: body)
+        .then((http.Response response) {
+      final int statusCode = response.statusCode;
+
+      print("status code :   $statusCode ");
+      print(response.body);
+
+      if (statusCode == 200) {
+        setState(() {
+          _status = true;
+          FocusScope.of(context).requestFocus(new FocusNode());
+        });
+
+        Toast.show(
+          "Password changed successfully",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.green,
+        );
+      } else {
+        Toast.show(
+          'Please enter valid details',
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.red,
+        );
+      }
+    });
+
+    setState(() {
+      _status = true;
+      FocusScope.of(context).requestFocus(new FocusNode());
+    });
   }
 
   Widget _getEditIcon() {

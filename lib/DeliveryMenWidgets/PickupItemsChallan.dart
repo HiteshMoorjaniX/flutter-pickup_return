@@ -66,7 +66,9 @@ generatePdf(listForChallan, grand_total) async {
 
   final String dir = (await getApplicationDocumentsDirectory()).path;
 
-  final String path = '$dir/challand.pdf';
+  Directory tempDir = await getTemporaryDirectory();
+  final String path = '${tempDir.path}/challand.pdf';
+  // final String path = '$dir/challand.pdf';
   print('path ::');
   print(path);
   final File file = File(path);

@@ -31,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final cellPhoneText = TextEditingController();
   final emailText = TextEditingController();
   final passwordText = TextEditingController();
+  final addressText = TextEditingController();
 
   @override
   void initState() {
@@ -118,6 +119,16 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: true,
       decoration: InputDecoration(
         hintText: 'Password',
+        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+      ),
+    );
+
+    final address = TextFormField(
+      controller: addressText,
+      autofocus: false,
+      decoration: InputDecoration(
+        hintText: 'Address',
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
@@ -283,6 +294,8 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(height: 8.0),
             password,
             SizedBox(height: 8.0),
+            address,
+            SizedBox(height: 8.0),
             state,
             SizedBox(height: 8.0),
             city,
@@ -330,13 +343,12 @@ class _RegisterPageState extends State<RegisterPage> {
     String passwordPattern =
         r'^(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
 
-    RegExp regExp = new RegExp(passwordPattern);
+    // RegExp regExp = new RegExp(passwordPattern);
     bool emailValid = RegExp(
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(emailText.text);
     bool cellValid = RegExp(r"^[0-9]{8,25}").hasMatch(cellPhoneText.text);
-    if (regExp.hasMatch(passwordText.text) &&
-        emailValid &&
+    if (emailValid &&
         cellValid &&
         companyNameText.text.isNotEmpty &&
         firstNameText.text.isNotEmpty &&
@@ -350,6 +362,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'password': passwordText.text,
         'state': dropdownValue,
         'city': dropdownValuecity,
+        'address': addressText.text,
       };
       await http
           .post(Api_Config.clientRegistration, body: body)
@@ -365,10 +378,8 @@ class _RegisterPageState extends State<RegisterPage> {
             gravity: Toast.CENTER,
             textColor: Colors.yellowAccent,
           );
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => MyApp()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (BuildContext context) => MyApp()));
         }
       });
     } else {
@@ -407,14 +418,6 @@ class _RegisterPageState extends State<RegisterPage> {
       } else if (!emailValid) {
         Toast.show(
           "Please enter valid Email Address",
-          context,
-          duration: 4,
-          gravity: Toast.CENTER,
-          textColor: Colors.yellowAccent,
-        );
-      } else if (!regExp.hasMatch(passwordText.text)) {
-        Toast.show(
-          "Password must be 6 character containig special symbol and alpha nuumeric character",
           context,
           duration: 4,
           gravity: Toast.CENTER,

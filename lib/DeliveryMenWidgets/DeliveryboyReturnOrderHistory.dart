@@ -64,13 +64,13 @@ class _DeliveryboyReturnOrderHistoryState
         } else {
           var return_id = users[index]['return_id'];
           return new ListTile(
-            leading: CircleAvatar(
-              radius: 30.0,
-              backgroundImage: new AssetImage('assets/as.png'),
-              // backgroundImage: NetworkImage(
-              //   users[index]['picture']['large'],
-              // ),
-            ),
+            // leading: CircleAvatar(
+            //   radius: 30.0,
+            //   backgroundImage: new AssetImage('assets/as.png'),
+            //   // backgroundImage: NetworkImage(
+            //   //   users[index]['picture']['large'],
+            //   // ),
+            // ),
             title: Text(users[index]['company_name']),
             subtitle: Text((users[index]['return_date'])),
             onTap: () => {

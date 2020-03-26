@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pickup_return/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pickup_return/api_config.dart' as Api_Config;
+import 'package:http/http.dart' as http;
+import 'package:toast/toast.dart';
 
 class ClientProfile extends StatefulWidget {
   @override
@@ -10,6 +13,9 @@ class ClientProfile extends StatefulWidget {
 class _ClientProfileState extends State<ClientProfile> {
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
+  final currentPassword = TextEditingController();
+  final newPassword = TextEditingController();
+  final confirmNewPassword = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +219,7 @@ class _ClientProfileState extends State<ClientProfile> {
                               children: <Widget>[
                                 new Flexible(
                                   child: TextField(
-                                    // controller: passwordText,
+                                    controller: currentPassword,
                                     obscureText: true,
                                     decoration: InputDecoration(
                                         hintText: "Current Password",
@@ -252,7 +258,7 @@ class _ClientProfileState extends State<ClientProfile> {
                               children: <Widget>[
                                 new Flexible(
                                   child: TextField(
-                                    // controller: passwordText,
+                                    controller: newPassword,
                                     obscureText: true,
                                     decoration: InputDecoration(
                                         hintText: "New Password",
@@ -291,7 +297,7 @@ class _ClientProfileState extends State<ClientProfile> {
                               children: <Widget>[
                                 new Flexible(
                                   child: TextField(
-                                    // controller: passwordText,
+                                    controller: confirmNewPassword,
                                     obscureText: true,
                                     decoration: InputDecoration(
                                         hintText: "Confirm New Password",
@@ -337,12 +343,7 @@ class _ClientProfileState extends State<ClientProfile> {
                 child: new Text("Save"),
                 textColor: Colors.white,
                 color: Colors.green,
-                onPressed: () {
-                  setState(() {
-                    _status = true;
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                  });
-                },
+                onPressed: () => save(),
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(20.0)),
               )),
@@ -372,6 +373,54 @@ class _ClientProfileState extends State<ClientProfile> {
         ],
       ),
     );
+  }
+
+  Future<void> save() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var authToken = prefs.getString('authToken');
+    Map<String, String> headerParams = {
+      "Accept": 'application/json',
+      "Authorization": "Bearer " "$authToken",
+    };
+    var body = {
+      "current_password": currentPassword.text,
+      'password': newPassword.text,
+      'password_confirmation': confirmNewPassword.text
+    };
+
+    await http
+        .post(Api_Config.changePassword, headers: headerParams, body: body)
+        .then((http.Response response) {
+      final int statusCode = response.statusCode;
+
+      print("status code :   $statusCode ");
+      print(response.body);
+
+      if (statusCode == 200) {
+        setState(() {
+          _status = true;
+          FocusScope.of(context).requestFocus(new FocusNode());
+        });
+
+        Toast.show(
+          "Password changed successfully",
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.green,
+        );
+        
+      } else {
+        Toast.show(
+          'Please enter valid details',
+          context,
+          duration: 4,
+          gravity: Toast.CENTER,
+          textColor: Colors.red,
+        );
+        
+      }
+    });
   }
 
   Widget _getEditIcon() {

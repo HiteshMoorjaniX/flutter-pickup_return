@@ -67,13 +67,13 @@ class _DeliveryboyPickupOrderHistoryState
         } else {
           var pickup_id = users[index]['pickup_id'];
           return new ListTile(
-            leading: CircleAvatar(
-              radius: 30.0,
-              backgroundImage: new AssetImage('assets/as.png'),
-              // backgroundImage: NetworkImage(
-              //   users[index]['picture']['large'],
-              // ),
-            ),
+            // leading: CircleAvatar(
+            //   radius: 30.0,
+            //   backgroundImage: new AssetImage('assets/as.png'),
+            //   // backgroundImage: NetworkImage(
+            //   //   users[index]['picture']['large'],
+            //   // ),
+            // ),
             title: Text(users[index]['company_name']),
             subtitle: Text((users[index]['pickup_date'])),
             onTap: () => {

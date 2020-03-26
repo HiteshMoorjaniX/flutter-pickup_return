@@ -8,6 +8,7 @@ import 'package:pickup_return/ClientWidgets/ClientReturnOrdersHistory.dart';
 import 'package:pickup_return/ClientWidgets/PendingPickupItemsIteration.dart';
 import 'package:pickup_return/ClientWidgets/PendingPickupItemsList.dart';
 import 'package:pickup_return/ClientWidgets/PendingReturnItems.dart';
+import 'package:pickup_return/ClientWidgets/RequestNewItem.dart';
 import 'package:pickup_return/api_config.dart' as Api_Config;
 import 'package:pickup_return/globals.dart' as globals;
 import 'package:http/http.dart' as http;
@@ -40,6 +41,7 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
     PendingReturnItems(),
     ClientPickupOrdersHistory(),
     ClientReturnOrdersHistory(),
+    RequestNewItem(),
     ClientProfile(),
   ];
 
@@ -146,6 +148,11 @@ class _PendingPickupItemsState extends State<PendingPickupItems> {
           // Icon(Icons.favorite,size: 20,color: Colors.blueAccent,),
           Icon(
             Icons.history,
+            size: 20,
+            color: Colors.blueAccent,
+          ),
+          Icon(
+            Icons.add,
             size: 20,
             color: Colors.blueAccent,
           ),

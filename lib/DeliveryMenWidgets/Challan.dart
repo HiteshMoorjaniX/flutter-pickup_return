@@ -56,7 +56,7 @@ class _PDFScreenState extends State<PDFScreen> {
           child: Column(
             children: <Widget>[
               Container(
-                height: 650.0,
+                height: 600.0,
                 child: PdfViewer(
                   filePath: widget.path,
                 ),

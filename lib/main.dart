@@ -22,7 +22,10 @@ Future<void> main() async {
     runApp(MaterialApp(home: ClientList(), debugShowCheckedModeBanner: false));
   } else if (usertype == 'client') {
     runApp(MaterialApp(
-        home: PendingPickupItems(navId: 0,), debugShowCheckedModeBanner: false));
+        home: PendingPickupItems(
+          navId: 0,
+        ),
+        debugShowCheckedModeBanner: false));
   } else {
     runApp(MaterialApp(home: MyApp(), debugShowCheckedModeBanner: false));
   }
@@ -190,27 +193,27 @@ class _MyAppState extends State<MyApp> {
                                 hintStyle: TextStyle(
                                     color: Colors.grey, fontSize: 12.0)),
                           ),
-                          SizedBox(
-                            height: ScreenUtil.getInstance().setHeight(35),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Text(
-                                "Forgot Password?",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    fontFamily: "Poppins-Medium",
-                                    fontSize:
-                                        ScreenUtil.getInstance().setSp(28)),
-                              )
-                            ],
-                          )
+                          // SizedBox(
+                          //   height: ScreenUtil.getInstance().setHeight(35),
+                          // ),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.end,
+                          //   children: <Widget>[
+                          //     Text(
+                          //       "Forgot Password?",
+                          //       style: TextStyle(
+                          //           color: Colors.blue,
+                          //           fontFamily: "Poppins-Medium",
+                          //           fontSize:
+                          //               ScreenUtil.getInstance().setSp(28)),
+                          //     )
+                          //   ],
+                          // )
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: ScreenUtil.getInstance().setHeight(20)),
+                  SizedBox(height: ScreenUtil.getInstance().setHeight(15)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
@@ -308,7 +311,9 @@ class _MyAppState extends State<MyApp> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            PendingPickupItems(navId: 0,)),
+                                            PendingPickupItems(
+                                              navId: 0,
+                                            )),
                                   );
                                 } else {
                                   Toast.show(
@@ -441,15 +446,17 @@ Future<String> fetchLogin({Map body}) async {
     print("status code :   $statusCode ");
     //print("Response :" + response.body);
     Map<String, dynamic> user = json.decode(response.body);
-    print("Access token :   ");
-    print(user['access_token']);
-    token = user['access_token'];
-    globals.authToken = token;
-    print(user['user']['id']);
-    print('User type : ');
-    print(user['user']['user_type']);
+    // print("Access token :   ");
+    // print(user['access_token']);
+    // token = user['access_token'];
+    // globals.authToken = token;
+    // print(user['user']['id']);
+    // print('User type : ');
+    // print(user['user']['user_type']);
 
     if (statusCode == 200) {
+      token = user['access_token'];
+      globals.authToken = token;
       return user['user']['user_type'];
     } else {
       return 'error';
